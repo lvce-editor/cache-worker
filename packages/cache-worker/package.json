@@ -1,0 +1,20 @@
+{
+  "name": "@lvce-editor/cache-worker",
+  "version": "0.1.0",
+  "description": "Worker APIs for Cache Storage, IndexedDB, and OPFS",
+  "license": "MIT",
+  "author": "Lvce Editor",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lvce-editor/cache-worker.git"
+  },
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./cacheWorkerMain.js": "./src/cacheWorkerMain.js"
+  },
+  "dependencies": {
+    "@lvce-editor/rpc": "^6.4.0"
+  }
+}

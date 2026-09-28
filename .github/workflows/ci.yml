@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15, windows-2025]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+      - uses: actions/cache@v6
+        id: node-modules
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}
+      - run: npm ci
+        if: steps.node-modules.outputs.cache-hit != 'true'
+      - run: npm test
+      - run: npm run build
+      - run: npm run lint
+
+  e2e:
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+      - uses: actions/cache@v6
+        id: node-modules
+        with:
+          path: node_modules
+          key: ubuntu-node-modules-${{ hashFiles('package-lock.json') }}
+      - run: npm ci
+        if: steps.node-modules.outputs.cache-hit != 'true'
+      - run: npm run build
+      - run: npx playwright install --with-deps ${{ matrix.browser }}
+      - run: npm run e2e -- --project=${{ matrix.browser }}
