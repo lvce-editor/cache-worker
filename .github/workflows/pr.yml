@@ -19,13 +19,18 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
+      - name: Compute node modules cache key
+        id: nodeModulesCacheKey
+        run: echo "value=$(node packages/build/src/computeNodeModulesCacheKey.js)" >> $GITHUB_OUTPUT
+        shell: bash
       - uses: actions/cache@v6
-        id: node-modules
+        id: npm-cache
         with:
-          path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}
-      - run: npm ci
-        if: steps.node-modules.outputs.cache-hit != 'true'
+          path: '**/node_modules'
+          key: ${{ runner.os }}-${{ runner.arch }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
+      - name: npm ci
+        run: npm ci
+        if: steps.npm-cache.outputs.cache-hit != 'true'
       - run: npm test
       - run: npm run build
       - run: npm run lint
@@ -41,13 +46,18 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
+      - name: Compute node modules cache key
+        id: nodeModulesCacheKey
+        run: echo "value=$(node packages/build/src/computeNodeModulesCacheKey.js)" >> $GITHUB_OUTPUT
+        shell: bash
       - uses: actions/cache@v6
-        id: node-modules
+        id: npm-cache
         with:
-          path: node_modules
-          key: ubuntu-node-modules-${{ hashFiles('package-lock.json') }}
-      - run: npm ci
-        if: steps.node-modules.outputs.cache-hit != 'true'
+          path: '**/node_modules'
+          key: ${{ runner.os }}-${{ runner.arch }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
+      - name: npm ci
+        run: npm ci
+        if: steps.npm-cache.outputs.cache-hit != 'true'
       - run: npm run build
       - run: npx playwright install --with-deps ${{ matrix.browser }}
       - run: npm run e2e -- --project=${{ matrix.browser }}
