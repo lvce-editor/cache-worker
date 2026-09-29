@@ -9,6 +9,7 @@ test('registers the documented storage commands for worker RPC', () => {
     'Cache.setCacheStorageItem',
     'IndexedDb.addIndexedDbFileHandle',
     'IndexedDb.getIndexedDbFileHandle',
+    'IndexedDb.removeIndexedDbFileHandle',
     'Opfs.readFile',
     'Opfs.removeFile',
     'Opfs.writeFile',

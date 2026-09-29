@@ -55,6 +55,44 @@ test('IndexedDB persists structured-cloneable values and file handles where supp
   }
 })
 
+test('IndexedDB removes only the requested value through worker RPC and commits the deletion', async ({ page }) => {
+  await page.goto('/')
+  const result = await page.evaluate(async () => {
+    const databaseName = `cache-worker-${crypto.randomUUID()}`
+    const { ModuleWorkerRpcParent } = await import('/.tmp/e2e/rpcClient.js')
+    const rpc = await ModuleWorkerRpcParent.create({ commandMap: {}, url: '/.tmp/dist/cacheWorkerMain.js' })
+    await rpc.invoke('IndexedDb.addIndexedDbFileHandle', 'remove-me', { name: 'removed' }, databaseName)
+    await rpc.invoke('IndexedDb.addIndexedDbFileHandle', 'keep-me', { name: 'kept' }, databaseName)
+    await rpc.invoke('IndexedDb.removeIndexedDbFileHandle', 'remove-me', databaseName)
+    const removed = await rpc.invoke('IndexedDb.getIndexedDbFileHandle', 'remove-me', databaseName)
+    const kept = await rpc.invoke('IndexedDb.getIndexedDbFileHandle', 'keep-me', databaseName)
+    await rpc.dispose()
+
+    const reopened = await ModuleWorkerRpcParent.create({ commandMap: {}, url: '/.tmp/dist/cacheWorkerMain.js' })
+    const persisted = await reopened.invoke('IndexedDb.getIndexedDbFileHandle', 'remove-me', databaseName)
+    let missingDeleteResolved = false
+    try {
+      await reopened.invoke('IndexedDb.removeIndexedDbFileHandle', 'missing', databaseName)
+      missingDeleteResolved = true
+    } finally {
+      await reopened.dispose()
+      await new Promise((resolve, reject) => {
+        const request = indexedDB.deleteDatabase(databaseName)
+        request.onsuccess = resolve
+        request.onerror = () => reject(request.error)
+        request.onblocked = () => reject(new Error('Deleting the test database was blocked'))
+      })
+    }
+    return {
+      removed: removed === null || removed === undefined,
+      kept,
+      persisted: persisted === null || persisted === undefined,
+      missingDeleteResolved,
+    }
+  })
+  expect(result).toEqual({ removed: true, kept: { name: 'kept' }, persisted: true, missingDeleteResolved: true })
+})
+
 test('OPFS supports writing, reading, removing, and rejects path traversal', async ({ page }) => {
   await page.goto('/')
   const result = await page.evaluate(async () => {

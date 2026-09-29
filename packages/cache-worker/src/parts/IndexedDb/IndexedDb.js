@@ -55,3 +55,15 @@ export const getIndexedDbFileHandle = async (key, databaseName = 'lvce-cache-wor
     database.close()
   }
 }
+
+export const removeIndexedDbFileHandle = async (key, databaseName = 'lvce-cache-worker') => {
+  const database = await openDatabase(databaseName)
+  const transaction = database.transaction('file-handles', 'readwrite')
+  const done = transactionDone(transaction)
+  const request = transaction.objectStore('file-handles').delete(key)
+  try {
+    await Promise.all([requestResult(request), done])
+  } finally {
+    database.close()
+  }
+}
