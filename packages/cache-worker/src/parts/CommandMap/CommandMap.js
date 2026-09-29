@@ -8,6 +8,7 @@ export const commandMap = {
   'Cache.removeCacheStorageItem': Cache.removeCacheStorageItem,
   'IndexedDb.addIndexedDbFileHandle': IndexedDb.addIndexedDbFileHandle,
   'IndexedDb.getIndexedDbFileHandle': IndexedDb.getIndexedDbFileHandle,
+  'IndexedDb.removeIndexedDbFileHandle': IndexedDb.removeIndexedDbFileHandle,
   'Opfs.readFile': Opfs.readFile,
   'Opfs.writeFile': Opfs.writeFile,
   'Opfs.removeFile': Opfs.removeFile,
