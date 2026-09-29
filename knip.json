@@ -1,0 +1,20 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "workspaces": {
+    ".": {
+      "project": ["*.js"]
+    },
+    "packages/cache-worker": {
+      "entry": ["src/index.js", "src/cacheWorkerMain.js"],
+      "project": ["src/**/*.js", "test/**/*.js"]
+    },
+    "packages/build": {
+      "entry": ["src/build.js", "src/computeNodeModulesCacheKey.js"],
+      "project": ["src/**/*.js"]
+    },
+    "packages/e2e": {
+      "entry": ["playwright.config.js", "server.js", "src/rpcClient.js", "test/**/*.spec.js"],
+      "project": ["*.js", "src/**/*.js", "test/**/*.js"]
+    }
+  }
+}

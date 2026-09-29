@@ -9,7 +9,7 @@
   "scripts": {
     "build": "node packages/build/src/build.js",
     "e2e": "playwright test --config packages/e2e/playwright.config.js",
-    "lint": "eslint . && prettier --check .",
+    "lint": "eslint . && prettier --check . && knip --no-config-hints",
     "test": "node --test packages/cache-worker/test/*.test.js"
   },
   "devDependencies": {
@@ -17,6 +17,7 @@
     "@playwright/test": "^1.55.0",
     "esbuild": "^0.28.0",
     "eslint": "^10.7.0",
+    "knip": "^6.38.0",
     "prettier": "^3.8.3"
   },
   "prettier": {

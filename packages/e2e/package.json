@@ -2,5 +2,8 @@
   "name": "@lvce-editor/cache-worker-e2e",
   "version": "0.1.0",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "@lvce-editor/rpc": "^6.21.1"
+  }
 }
