@@ -2,7 +2,7 @@ import { describe, expect, it } from '@jest/globals'
 import { resolveVersion } from '../src/version.ts'
 
 describe('resolveVersion', () => {
-  it('uses a release version matching the source package version', () => {
+  it('uses the configured release version', () => {
     expect(resolveVersion({ RG_VERSION: '0.1.0' })).toBe('0.1.0')
   })
 

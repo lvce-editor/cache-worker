@@ -1,6 +1,6 @@
 {
   "name": "@lvce-editor/cache-worker",
-  "version": "0.1.0",
+  "version": "0.0.0-dev",
   "description": "Worker APIs for Cache Storage, IndexedDB, and OPFS",
   "license": "MIT",
   "author": "Lvce Editor",
