@@ -17,6 +17,7 @@ jobs:
     steps:
       - name: Get the release version from the tag
         id: release-version
+        shell: bash
         run: echo "version=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
       - name: Create draft GitHub release
         uses: softprops/action-gh-release@v2
@@ -25,10 +26,17 @@ jobs:
           name: ${{ steps.release-version.outputs.version }}
           draft: true
 
-  publish:
-    name: publish
+  build-release:
+    name: build-release
     needs: create-release
-    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: true
+      max-parallel: 1
+      matrix:
+        os: [windows-2025, macos-15, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    env:
+      RG_VERSION: ${{ needs.create-release.outputs.version }}
     permissions:
       contents: write
       id-token: write
@@ -50,15 +58,17 @@ jobs:
       - name: npm ci
         run: npm ci
         if: steps.npm-cache.outputs.cache-hit != 'true'
-      - name: Set package version from release tag
-        run: npm version "${GITHUB_REF_NAME#v}" --workspace=@lvce-editor/cache-worker --no-git-tag-version
       - run: npm test
       - run: npm run build
+      - run: npm run lint
       - name: Publish package to npm
-        run: npm publish .tmp/dist --access public --provenance
+        if: matrix.os == 'ubuntu-24.04'
+        run: npm publish --access public --provenance
+        working-directory: ./.tmp/dist
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Publish GitHub release
+        if: matrix.os == 'ubuntu-24.04'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release edit "${{ needs.create-release.outputs.version }}" --draft=false

@@ -12,7 +12,7 @@
     "e2e:firefox:headless": "npm run e2e:firefox:headless --workspace=packages/e2e",
     "e2e:headless": "npm run e2e:headless --workspace=packages/e2e --",
     "lint": "eslint . && prettier --check . && knip --no-config-hints",
-    "test": "node --test packages/cache-worker/test/*.test.ts",
+    "test": "node --test packages/cache-worker/test/*.test.ts packages/build/test/*.test.ts",
     "type-check": "tsc -b"
   },
   "devDependencies": {

@@ -1,6 +1,7 @@
 import { build } from 'esbuild'
 import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { bundleJs } from './bundleJs.ts'
+import { getVersion } from './version.ts'
 
 await rm('.tmp/dist', { force: true, recursive: true })
 await rm('packages/e2e/src', { force: true, recursive: true })
@@ -19,6 +20,7 @@ await build({
 const packageJson = JSON.parse(await readFile('packages/cache-worker/package.json', 'utf8'))
 delete packageJson.devDependencies
 delete packageJson.dependencies
+packageJson.version = await getVersion()
 packageJson.main = 'index.js'
 packageJson.exports = {
   '.': './index.js',
