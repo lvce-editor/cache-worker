@@ -12,14 +12,17 @@
     "e2e:firefox:headless": "npm run e2e:firefox:headless --workspace=packages/e2e",
     "e2e:headless": "npm run e2e:headless --workspace=packages/e2e --",
     "lint": "eslint . && prettier --check . && knip --no-config-hints",
-    "test": "node --test packages/cache-worker/test/*.test.js"
+    "test": "node --test packages/cache-worker/test/*.test.js",
+    "type-check": "tsc -b"
   },
   "devDependencies": {
     "@lvce-editor/eslint-config": "^16.3.0",
+    "@types/node": "^26.0.1",
     "esbuild": "^0.28.0",
     "eslint": "^10.7.0",
     "knip": "^6.38.0",
-    "prettier": "^3.8.3"
+    "prettier": "^3.8.3",
+    "typescript": "^6.0.3"
   },
   "prettier": {
     "semi": false,
