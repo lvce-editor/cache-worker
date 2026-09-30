@@ -1,12 +1,10 @@
-import type { Test } from '@lvce-editor/test-with-playwright'
-
-export const test: Test = async ({ CacheWorker }) => {
-  const { assertEqual, deleteDatabase } = await import('./_helpers.ts')
+export const test = async (): Promise<void> => {
+  const { assertEqual, createCacheWorker, deleteDatabase } = await import('./_helpers.ts')
   const databaseName = `cache-worker-${crypto.randomUUID()}`
   let cacheWorker
   let reopened
   try {
-    cacheWorker = await CacheWorker.create(new URL('.tmp/cacheWorkerMain.js', import.meta.url))
+    cacheWorker = await createCacheWorker(new URL('.tmp/cacheWorkerMain.js', import.meta.url))
     await cacheWorker.addIndexedDbFileHandle('remove-me', { name: 'removed' }, databaseName)
     await cacheWorker.addIndexedDbFileHandle('keep-me', { name: 'kept' }, databaseName)
     await cacheWorker.removeIndexedDbFileHandle('remove-me', databaseName)
@@ -14,7 +12,7 @@ export const test: Test = async ({ CacheWorker }) => {
     const kept = await cacheWorker.getIndexedDbFileHandle('keep-me', databaseName)
     await cacheWorker.dispose()
     cacheWorker = undefined
-    reopened = await CacheWorker.create(new URL('.tmp/cacheWorkerMain.js', import.meta.url))
+    reopened = await createCacheWorker(new URL('.tmp/cacheWorkerMain.js', import.meta.url))
     const persisted = await reopened.getIndexedDbFileHandle('remove-me', databaseName)
     await reopened.removeIndexedDbFileHandle('missing', databaseName)
     assertEqual(

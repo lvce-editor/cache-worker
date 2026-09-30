@@ -1,10 +1,8 @@
-import type { Test } from '@lvce-editor/test-with-playwright'
-
-export const test: Test = async ({ CacheWorker }) => {
-  const { assertEqual, deleteDatabase } = await import('./_helpers.ts')
+export const test = async (): Promise<void> => {
+  const { assertEqual, createCacheWorker, deleteDatabase } = await import('./_helpers.ts')
   const databaseName = `cache-worker-${crypto.randomUUID()}`
   const isChromium = navigator.userAgent.includes('Chrome/')
-  const cacheWorker = await CacheWorker.create(new URL('.tmp/cacheWorkerMain.js', import.meta.url))
+  const cacheWorker = await createCacheWorker(new URL('.tmp/cacheWorkerMain.js', import.meta.url))
   let root: FileSystemDirectoryHandle | undefined
   let handleName: string | undefined
   try {
