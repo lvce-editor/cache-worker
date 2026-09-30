@@ -27,7 +27,7 @@ await test('handles cache operations over a transferred message port', async () 
   try {
     await parentRpc.invoke('Cache.setCacheStorageItem', '/readme', '# Cached markdown', 'extension-detail-test')
     const cached = await parentRpc.invoke('Cache.getCacheStorageItem', '/readme', 'extension-detail-test')
-    assert.equal(cached.body, '# Cached markdown')
+    assert.equal(new TextDecoder().decode(cached.body), '# Cached markdown')
     assert.equal(cached.status, 200)
   } finally {
     await parentRpc.dispose()
