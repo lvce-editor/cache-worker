@@ -8,15 +8,7 @@ export const assertEqual = (actual: unknown, expected: unknown, message: string)
   }
 }
 
-export const deleteDatabase = (databaseName: string): Promise<void> => {
-  const { promise, reject, resolve } = Promise.withResolvers<void>()
-  try {
-    const request = indexedDB.deleteDatabase(databaseName)
-    request.onsuccess = (): void => resolve()
-    request.onerror = (): void => reject(request.error ?? new Error('Deleting the test database failed'))
-    request.onblocked = (): void => reject(new Error('Deleting the test database was blocked'))
-  } catch (error) {
-    reject(error)
-  }
-  return promise
+export const deleteDatabase = async (databaseName: string): Promise<void> => {
+  const { deleteDB } = await import('idb')
+  await deleteDB(databaseName)
 }
