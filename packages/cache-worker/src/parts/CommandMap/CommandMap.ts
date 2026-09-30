@@ -1,8 +1,10 @@
 import * as Cache from '../Cache/Cache.ts'
 import * as IndexedDb from '../IndexedDb/IndexedDb.ts'
+import * as Listen from '../Listen/Listen.ts'
 import * as Opfs from '../Opfs/Opfs.ts'
 
 export const commandMap = {
+  'CacheWorker.handleMessagePort': Listen.handleMessagePort,
   'Cache.getCacheStorageItem': Cache.getCacheStorageItem,
   'Cache.removeCacheStorageItem': Cache.removeCacheStorageItem,
   'Cache.setCacheStorageItem': Cache.setCacheStorageItem,
