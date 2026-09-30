@@ -62,6 +62,8 @@ test('cache items preserve raw text and headers in the selected storage bucket',
       status: 200,
       statusText: '',
     })
+    assert.equal(await Cache.getCacheStorageItem('/readme', 'extensions', 'other-bucket', options), null)
+    assert.equal(await Cache.getCacheStorageItem('/readme', 'other-cache', 'extension-cache', options), null)
     assert.deepEqual(opened[0], { bucketName: 'extension-cache', options })
   })
 })
