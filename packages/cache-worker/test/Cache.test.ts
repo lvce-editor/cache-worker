@@ -1,5 +1,4 @@
-import assert from 'node:assert/strict'
-import test from 'node:test'
+import { expect, test } from '@jest/globals'
 import type { StorageBucketOptions } from '../src/parts/Cache/Cache.ts'
 import * as Cache from '../src/parts/Cache/Cache.ts'
 
@@ -22,13 +21,13 @@ const withGlobals = async (values: Readonly<Record<string, unknown>>, fn: () => 
       if (descriptor) {
         Object.defineProperty(globalThis, key, descriptor)
       } else {
-        Object.defineProperty(globalThis, key, { configurable: true, value: undefined })
+        delete (globalThis as Record<string, unknown>)[key]
       }
     }
   }
 }
 
-await test('cache items preserve binary bodies and headers in the selected storage bucket', async (): Promise<void> => {
+test('cache items preserve binary bodies and headers in the selected storage bucket', async (): Promise<void> => {
   const records = new Map<string, Map<string, Readonly<Response>>>()
   const opened: Array<{ bucketName: string; options: Readonly<StorageBucketOptions> }> = []
   const navigator = {
@@ -68,23 +67,22 @@ await test('cache items preserve binary bodies and headers in the selected stora
   await withGlobals({ navigator }, async () => {
     const options = { expires: 1234, quota: 1024 }
     const bytes = Uint8Array.of(0, 255, 128, 65)
-    assert.deepEqual(
+    expect(
       await Cache.setCacheStorageItem('/readme', bytes, 'extensions', { 'Content-Type': 'application/octet-stream' }, 'extension-cache', options),
-      { success: true },
-    )
-    assert.deepEqual(await Cache.getCacheStorageItem('/readme', 'extensions', 'extension-cache', options), {
+    ).toEqual({ success: true })
+    expect(await Cache.getCacheStorageItem('/readme', 'extensions', 'extension-cache', options)).toEqual({
       body: bytes.buffer,
       headers: { 'content-type': 'application/octet-stream' },
       status: 200,
       statusText: '',
     })
-    assert.equal(await Cache.getCacheStorageItem('/readme', 'extensions', 'other-bucket', options), null)
-    assert.equal(await Cache.getCacheStorageItem('/readme', 'other-cache', 'extension-cache', options), null)
-    assert.deepEqual(opened[0], { bucketName: 'extension-cache', options })
+    expect(await Cache.getCacheStorageItem('/readme', 'extensions', 'other-bucket', options)).toBeNull()
+    expect(await Cache.getCacheStorageItem('/readme', 'other-cache', 'extension-cache', options)).toBeNull()
+    expect(opened[0]).toEqual({ bucketName: 'extension-cache', options })
   })
 })
 
-await test('cache write failures are returned as error values', async (): Promise<void> => {
+test('cache write failures are returned as error values', async (): Promise<void> => {
   await withGlobals(
     {
       caches: {
@@ -98,7 +96,7 @@ await test('cache write failures are returned as error values', async (): Promis
       },
     },
     async () => {
-      assert.deepEqual(await Cache.setCacheStorageItem('/readme', 'text'), {
+      expect(await Cache.setCacheStorageItem('/readme', 'text')).toEqual({
         errorCode: 'CACHE_STORAGE_WRITE_FAILED',
         errorMessage: 'quota exceeded',
         success: false,
@@ -116,7 +114,7 @@ await test('cache write failures are returned as error values', async (): Promis
       },
     },
     async () => {
-      assert.deepEqual(await Cache.setCacheStorageItem('/readme', 'text', 'extensions', {}, 'extension-cache'), {
+      expect(await Cache.setCacheStorageItem('/readme', 'text', 'extensions', {}, 'extension-cache')).toEqual({
         errorCode: 'CACHE_STORAGE_WRITE_FAILED',
         errorMessage: 'bucket unavailable',
         success: false,
