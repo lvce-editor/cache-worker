@@ -1,18 +1,11 @@
 import { build } from 'esbuild'
 import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { bundleJs } from './bundleJs.js'
 
 await rm('.tmp/dist', { force: true, recursive: true })
 await rm('.tmp/e2e', { force: true, recursive: true })
 await mkdir('.tmp/dist', { recursive: true })
-await build({
-  entryPoints: ['packages/cache-worker/src/cacheWorkerMain.js'],
-  bundle: true,
-  format: 'esm',
-  platform: 'browser',
-  target: ['es2022'],
-  external: ['node:*', 'electron', 'ws'],
-  outfile: '.tmp/dist/cacheWorkerMain.js',
-})
+await bundleJs()
 await mkdir('.tmp/e2e', { recursive: true })
 await build({
   entryPoints: ['packages/e2e/src/rpcClient.js'],
