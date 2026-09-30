@@ -1,25 +1,25 @@
 export const test = async (): Promise<void> => {
-  const { assertEqual, createRpc } = await import('./_helpers.ts')
-  const rpc = await createRpc()
+  const { assertEqual, createCacheWorker } = await import('./_helpers.ts')
+  const cacheWorker = await createCacheWorker(new URL('.tmp/cacheWorkerMain.js', import.meta.url))
   const name = `cache-worker-${crypto.randomUUID()}.txt`
   let text
   let traversalRejected = false
   try {
-    await rpc.invoke('Opfs.writeFile', name, 'persistent text')
-    text = await rpc.invoke('Opfs.readFile', name)
-    await rpc.invoke('Opfs.removeFile', name)
+    await cacheWorker.writeFile(name, 'persistent text')
+    text = await cacheWorker.readFile(name)
+    await cacheWorker.removeFile(name)
     try {
-      await rpc.invoke('Opfs.readFile', '../outside.txt')
+      await cacheWorker.readFile('../outside.txt')
     } catch (error) {
       traversalRejected = error instanceof TypeError
     }
   } finally {
     try {
-      await rpc.invoke('Opfs.removeFile', name)
+      await cacheWorker.removeFile(name)
     } catch {
       // The file may already have been removed by the scenario.
     }
-    await rpc.dispose()
+    await cacheWorker.dispose()
   }
   assertEqual({ text, traversalRejected }, { text: 'persistent text', traversalRejected: true }, 'OPFS should enforce file access boundaries')
 }

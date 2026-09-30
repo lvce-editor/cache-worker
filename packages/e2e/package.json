@@ -9,10 +9,8 @@
     "e2e:headless": "test-with-playwright --headless",
     "type-check": "tsc"
   },
-  "dependencies": {
-    "@lvce-editor/rpc": "^6.21.1"
-  },
   "devDependencies": {
-    "@lvce-editor/test-with-playwright": "^22.38.2"
+    "@lvce-editor/test-with-playwright": "^22.38.2",
+    "@lvce-editor/test-worker": "^17.27.7"
   }
 }
