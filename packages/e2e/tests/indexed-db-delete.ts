@@ -1,20 +1,22 @@
-export const test = async (): Promise<void> => {
-  const { assertEqual, createRpc, deleteDatabase } = await import('./_helpers.ts')
+import type { Test } from '@lvce-editor/test-with-playwright'
+
+export const test: Test = async ({ CacheWorker }) => {
+  const { assertEqual, deleteDatabase } = await import('./_helpers.ts')
   const databaseName = `cache-worker-${crypto.randomUUID()}`
-  let rpc
+  let cacheWorker
   let reopened
   try {
-    rpc = await createRpc()
-    await rpc.invoke('IndexedDb.addIndexedDbFileHandle', 'remove-me', { name: 'removed' }, databaseName)
-    await rpc.invoke('IndexedDb.addIndexedDbFileHandle', 'keep-me', { name: 'kept' }, databaseName)
-    await rpc.invoke('IndexedDb.removeIndexedDbFileHandle', 'remove-me', databaseName)
-    const removed = await rpc.invoke('IndexedDb.getIndexedDbFileHandle', 'remove-me', databaseName)
-    const kept = await rpc.invoke('IndexedDb.getIndexedDbFileHandle', 'keep-me', databaseName)
-    await rpc.dispose()
-    rpc = undefined
-    reopened = await createRpc()
-    const persisted = await reopened.invoke('IndexedDb.getIndexedDbFileHandle', 'remove-me', databaseName)
-    await reopened.invoke('IndexedDb.removeIndexedDbFileHandle', 'missing', databaseName)
+    cacheWorker = await CacheWorker.create(new URL('.tmp/cacheWorkerMain.js', import.meta.url))
+    await cacheWorker.addIndexedDbFileHandle('remove-me', { name: 'removed' }, databaseName)
+    await cacheWorker.addIndexedDbFileHandle('keep-me', { name: 'kept' }, databaseName)
+    await cacheWorker.removeIndexedDbFileHandle('remove-me', databaseName)
+    const removed = await cacheWorker.getIndexedDbFileHandle('remove-me', databaseName)
+    const kept = await cacheWorker.getIndexedDbFileHandle('keep-me', databaseName)
+    await cacheWorker.dispose()
+    cacheWorker = undefined
+    reopened = await CacheWorker.create(new URL('.tmp/cacheWorkerMain.js', import.meta.url))
+    const persisted = await reopened.getIndexedDbFileHandle('remove-me', databaseName)
+    await reopened.removeIndexedDbFileHandle('missing', databaseName)
     assertEqual(
       {
         kept,
@@ -25,7 +27,7 @@ export const test = async (): Promise<void> => {
       'IndexedDB should commit targeted deletion',
     )
   } finally {
-    await rpc?.dispose()
+    await cacheWorker?.dispose()
     await reopened?.dispose()
     await deleteDatabase(databaseName)
   }

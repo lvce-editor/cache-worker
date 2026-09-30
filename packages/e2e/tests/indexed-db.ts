@@ -1,34 +1,31 @@
-export const test = async (): Promise<void> => {
-  const { assertEqual, createRpc, deleteDatabase } = await import('./_helpers.ts')
+import type { Test } from '@lvce-editor/test-with-playwright'
+
+export const test: Test = async ({ CacheWorker }) => {
+  const { assertEqual, deleteDatabase } = await import('./_helpers.ts')
   const databaseName = `cache-worker-${crypto.randomUUID()}`
-  const rpc = await createRpc()
   const isChromium = navigator.userAgent.includes('Chrome/')
-  if (isChromium) {
-    // Reading an OPFS handle back from IndexedDB crashes this local Chromium build; keep the general structured-clone path covered here.
-    try {
-      await rpc.invoke('IndexedDb.addIndexedDbFileHandle', 'value', { name: 'cloneable-value' }, databaseName)
-      const result = await rpc.invoke<{ readonly name: string }>('IndexedDb.getIndexedDbFileHandle', 'value', databaseName)
-      assertEqual(result, { name: 'cloneable-value' }, 'IndexedDB should preserve structured-cloneable values')
-    } finally {
-      await rpc.dispose()
-      await deleteDatabase(databaseName)
-    }
-    return
-  }
-  const root = await navigator.storage.getDirectory()
-  const handleName = `handle-${crypto.randomUUID()}`
-  const handle = await root.getFileHandle(handleName, { create: true })
+  const cacheWorker = await CacheWorker.create(new URL('.tmp/cacheWorkerMain.js', import.meta.url))
+  let root: FileSystemDirectoryHandle | undefined
+  let handleName: string | undefined
   try {
-    await rpc.invoke('IndexedDb.addIndexedDbFileHandle', 'file', handle, databaseName)
-    const restored = await rpc.invoke<{ isSameEntry: (handle: FileSystemFileHandle) => Promise<boolean> }>(
-      'IndexedDb.getIndexedDbFileHandle',
-      'file',
-      databaseName,
-    )
+    if (isChromium) {
+      // Reading an OPFS handle back from IndexedDB crashes this local Chromium build; keep the general structured-clone path covered here.
+      await cacheWorker.addIndexedDbFileHandle('value', { name: 'cloneable-value' }, databaseName)
+      const result = (await cacheWorker.getIndexedDbFileHandle('value', databaseName)) as { readonly name: string }
+      assertEqual(result, { name: 'cloneable-value' }, 'IndexedDB should preserve structured-cloneable values')
+      return
+    }
+    root = await navigator.storage.getDirectory()
+    handleName = `handle-${crypto.randomUUID()}`
+    const handle = await root.getFileHandle(handleName, { create: true })
+    await cacheWorker.addIndexedDbFileHandle('file', handle, databaseName)
+    const restored = (await cacheWorker.getIndexedDbFileHandle('file', databaseName)) as FileSystemFileHandle
     assertEqual(await restored.isSameEntry(handle), true, 'IndexedDB should restore the same file handle')
   } finally {
-    await rpc.dispose()
+    await cacheWorker.dispose()
     await deleteDatabase(databaseName)
-    await root.removeEntry(handleName)
+    if (root && handleName) {
+      await root.removeEntry(handleName)
+    }
   }
 }
