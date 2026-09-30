@@ -12,17 +12,49 @@
     "e2e:firefox:headless": "npm run e2e:firefox:headless --workspace=packages/e2e",
     "e2e:headless": "npm run e2e:headless --workspace=packages/e2e --",
     "lint": "eslint . && prettier --check . && knip --no-config-hints",
-    "test": "node --test packages/cache-worker/test/*.test.ts packages/build/test/*.test.ts",
+    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
     "type-check": "tsc -b"
   },
   "devDependencies": {
+    "@jest/globals": "^30.4.1",
     "@lvce-editor/eslint-config": "^16.3.0",
     "@types/node": "^26.0.1",
     "esbuild": "^0.28.0",
     "eslint": "^10.7.0",
+    "jest": "^30.4.2",
     "knip": "^6.38.0",
     "prettier": "^3.8.3",
+    "ts-jest": "^29.4.10",
     "typescript": "^6.0.3"
+  },
+  "jest": {
+    "injectGlobals": false,
+    "testEnvironment": "node",
+    "testMatch": [
+      "<rootDir>/packages/cache-worker/test/**/*.test.ts",
+      "<rootDir>/packages/build/test/**/*.test.ts"
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/.tmp/"
+    ],
+    "extensionsToTreatAsEsm": [
+      ".ts"
+    ],
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
+    },
+    "transform": {
+      "^.+\\.tsx?$": [
+        "ts-jest",
+        {
+          "useESM": true,
+          "tsconfig": {
+            "module": "ESNext",
+            "esModuleInterop": true
+          }
+        }
+      ]
+    }
   },
   "prettier": {
     "semi": false,
