@@ -7,16 +7,40 @@ test('Cache Storage supports get, set, and remove through worker RPC', async ({ 
     const rpc = await ModuleWorkerRpcParent.create({ commandMap: {}, url: '/.tmp/dist/cacheWorkerMain.js' })
     const cacheName = `cache-worker-${crypto.randomUUID()}`
     const key = `/cache-worker/${crypto.randomUUID()}`
-    await rpc.invoke('Cache.setCacheStorageItem', key, 'stored text', cacheName)
+    const write = await rpc.invoke('Cache.setCacheStorageItem', key, 'stored text', cacheName, { 'Content-Type': 'text/markdown' })
     const stored = await rpc.invoke('Cache.getCacheStorageItem', key, cacheName)
-    const body = new TextDecoder().decode(stored.body)
+    const body = stored.body
     const removed = await rpc.invoke('Cache.removeCacheStorageItem', key, cacheName)
     const missing = await rpc.invoke('Cache.getCacheStorageItem', key, cacheName)
     await caches.delete(cacheName)
     await rpc.dispose()
-    return { body, removed, missing }
+    return { body, headers: stored.headers, write, removed, missing }
   })
-  expect(result).toEqual({ body: 'stored text', removed: true, missing: null })
+  expect(result).toEqual({
+    body: 'stored text',
+    headers: { 'content-type': 'text/markdown' },
+    write: { success: true },
+    removed: true,
+    missing: null,
+  })
+})
+
+test('Cache Storage write errors are returned as values', async ({ page }) => {
+  await page.goto('/')
+  const result = await page.evaluate(async () => {
+    const { ModuleWorkerRpcParent } = await import('/.tmp/e2e/rpcClient.js')
+    const rpc = await ModuleWorkerRpcParent.create({ commandMap: {}, url: '/.tmp/dist/cacheWorkerMain.js' })
+    try {
+      return await rpc.invoke('Cache.setCacheStorageItem', '/invalid-header', 'text', `cache-worker-${crypto.randomUUID()}`, {
+        'Bad Header': 'value',
+      })
+    } finally {
+      await rpc.dispose()
+    }
+  })
+  expect(result.success).toBe(false)
+  expect(result.errorCode).toBe('CACHE_STORAGE_WRITE_FAILED')
+  expect(result.errorMessage).toBeTruthy()
 })
 
 test('IndexedDB persists structured-cloneable values and file handles where supported', async ({ page, browserName }) => {
