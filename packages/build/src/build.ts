@@ -6,16 +6,8 @@ import { getVersion } from './version.ts'
 await rm('.tmp/dist', { force: true, recursive: true })
 await rm('packages/e2e/src', { force: true, recursive: true })
 await mkdir('.tmp/dist', { recursive: true })
-await bundleJs()
-
-await build({
-  entryPoints: ['packages/cache-worker/src/index.ts'],
-  bundle: false,
-  format: 'esm',
-  platform: 'browser',
-  target: ['es2022'],
-  outfile: '.tmp/dist/index.js',
-})
+await bundleJs('packages/cache-worker/src/cacheWorkerMain.ts', '.tmp/dist/cacheWorkerMain.js')
+await bundleJs('packages/cache-worker/src/index.ts', '.tmp/dist/index.js')
 
 const packageJson = JSON.parse(await readFile('packages/cache-worker/package.json', 'utf8'))
 delete packageJson.devDependencies
