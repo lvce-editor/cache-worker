@@ -1,5 +1,22 @@
 import { expect, test } from '@playwright/test'
 
+test('package entry resolves and loads the production worker', async ({ page }) => {
+  await page.goto('/')
+  const result = await page.evaluate(async () => {
+    const { getCacheWorkerUrl } = await import('/.tmp/dist/index.js')
+    const { ModuleWorkerRpcParent } = await import('/.tmp/e2e/rpcClient.js')
+    const cacheName = `cache-worker-${crypto.randomUUID()}`
+    const rpc = await ModuleWorkerRpcParent.create({ commandMap: {}, url: getCacheWorkerUrl() })
+    try {
+      return await rpc.invoke('Cache.getCacheStorageItem', '/missing', cacheName)
+    } finally {
+      await rpc.dispose()
+      await caches.delete(cacheName)
+    }
+  })
+  expect(result).toBeNull()
+})
+
 test('Cache Storage supports get, set, and remove through worker RPC', async ({ page }) => {
   await page.goto('/')
   const result = await page.evaluate(async () => {

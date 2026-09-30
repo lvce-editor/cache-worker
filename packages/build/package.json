@@ -2,5 +2,9 @@
   "name": "@lvce-editor/cache-worker-build",
   "version": "0.1.0",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "rollup": "^4.63.4"
+  }
 }
