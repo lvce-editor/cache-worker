@@ -8,27 +8,38 @@ const cloneDatabaseKey = (
 const requestResult = <T>(
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- IDBRequest is consumed through read-only members and event listeners.
   request: Readonly<Pick<IDBRequest<T>, 'addEventListener' | 'error' | 'result'>>,
-): Promise<T> =>
-  new Promise<T>((resolve, reject) => {
+): Promise<T> => {
+  const { promise, reject, resolve } = Promise.withResolvers<T>()
+  try {
     request.addEventListener('success', (): void => resolve(request.result), { once: true })
     request.addEventListener('error', (): void => reject(request.error ?? new Error('IndexedDB request failed')), { once: true })
-  })
+  } catch (error) {
+    reject(error)
+  }
+  return promise
+}
 
 const transactionDone = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- IDBTransaction is observed through events and its error value.
   transaction: Readonly<Pick<IDBTransaction, 'addEventListener' | 'error'>>,
-): Promise<void> =>
-  new Promise<void>((resolve, reject) => {
+): Promise<void> => {
+  const { promise, reject, resolve } = Promise.withResolvers<void>()
+  try {
     transaction.addEventListener('complete', (): void => resolve(undefined), { once: true })
     transaction.addEventListener('abort', (): void => reject(transaction.error ?? new Error('IndexedDB transaction aborted')), { once: true })
     transaction.addEventListener('error', (): void => reject(transaction.error ?? new Error('IndexedDB transaction failed')), { once: true })
-  })
+  } catch (error) {
+    reject(error)
+  }
+  return promise
+}
 
 const openDatabase = (name: string): Promise<IDBDatabase> => {
   if (typeof indexedDB === 'undefined') {
     throw new Error('IndexedDB is not available in this context')
   }
-  return new Promise<IDBDatabase>((resolve, reject) => {
+  const { promise, reject, resolve } = Promise.withResolvers<IDBDatabase>()
+  try {
     const request = indexedDB.open(name, 1)
     request.onupgradeneeded = (): void => {
       if (!request.result.objectStoreNames.contains('file-handles')) {
@@ -41,7 +52,10 @@ const openDatabase = (name: string): Promise<IDBDatabase> => {
     }
     request.onerror = (): void => reject(request.error ?? new Error('Failed to open IndexedDB database'))
     request.onblocked = (): void => reject(new Error(`Opening IndexedDB database "${name}" was blocked`))
-  })
+  } catch (error) {
+    reject(error)
+  }
+  return promise
 }
 
 export const addIndexedDbFileHandle = async (
