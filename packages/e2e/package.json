@@ -6,7 +6,8 @@
   "scripts": {
     "e2e": "test-with-playwright",
     "e2e:firefox:headless": "test-with-playwright --headless --browser=firefox",
-    "e2e:headless": "test-with-playwright --headless"
+    "e2e:headless": "test-with-playwright --headless",
+    "type-check": "tsc"
   },
   "dependencies": {
     "@lvce-editor/rpc": "^6.21.1"

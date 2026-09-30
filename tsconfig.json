@@ -1,18 +1,5 @@
 {
   "files": [],
   "include": [],
-  "references": [
-    {
-      "path": "./packages/cache-worker"
-    },
-    {
-      "path": "./packages/build"
-    },
-    {
-      "path": "./packages/server"
-    },
-    {
-      "path": "./packages/e2e"
-    }
-  ]
+  "references": [{ "path": "./packages/cache-worker" }, { "path": "./packages/build" }, { "path": "./packages/e2e" }, { "path": "./packages/server" }]
 }

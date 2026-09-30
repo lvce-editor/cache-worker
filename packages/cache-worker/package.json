@@ -9,10 +9,10 @@
     "url": "git+https://github.com/lvce-editor/cache-worker.git"
   },
   "type": "module",
-  "main": "src/index.js",
+  "main": "src/index.ts",
   "exports": {
-    ".": "./src/index.js",
-    "./cacheWorkerMain.js": "./src/cacheWorkerMain.js"
+    ".": "./src/index.ts",
+    "./cacheWorkerMain.js": "./src/cacheWorkerMain.ts"
   },
   "dependencies": {
     "@lvce-editor/rpc": "^6.4.0"

@@ -2,23 +2,23 @@
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "workspaces": {
     ".": {
-      "project": ["*.js"]
-    },
-    "packages/cache-worker": {
-      "entry": ["src/index.js", "src/cacheWorkerMain.js"],
-      "project": ["src/**/*.js", "test/**/*.js"]
+      "project": ["*.js", "*.ts"]
     },
     "packages/build": {
-      "entry": ["src/build.js", "src/computeNodeModulesCacheKey.js"],
-      "project": ["src/**/*.js"]
+      "entry": ["src/**/*.ts"],
+      "project": ["src/**/*.ts"]
+    },
+    "packages/cache-worker": {
+      "entry": ["src/**/*.ts"],
+      "project": ["src/**/*.ts", "test/**/*.ts"]
     },
     "packages/e2e": {
-      "entry": ["e2e.config.js", "src/**/*.js"],
-      "project": ["*.js", "src/**/*.js"]
+      "entry": ["tests/**/*.ts"],
+      "project": ["tests/**/*.ts"]
     },
     "packages/server": {
-      "entry": ["src/server.js"],
-      "project": ["src/**/*.js"]
+      "entry": ["src/**/*.ts"],
+      "project": ["src/**/*.ts"]
     }
   }
 }

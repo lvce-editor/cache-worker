@@ -9,7 +9,7 @@ const locations = [
   '.github/workflows/ci.yml',
   '.github/workflows/release.yml',
   'packages/build/package.json',
-  'packages/build/src/computeNodeModulesCacheKey.js',
+  'packages/build/src/computeNodeModulesCacheKey.ts',
   'packages/cache-worker/package.json',
   'packages/e2e/package.json',
 ]
