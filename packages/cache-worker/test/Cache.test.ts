@@ -28,7 +28,7 @@ const withGlobals = async (values: Readonly<Record<string, unknown>>, fn: () => 
   }
 }
 
-await test('cache items preserve raw text and headers in the selected storage bucket', async (): Promise<void> => {
+await test('cache items preserve binary bodies and headers in the selected storage bucket', async (): Promise<void> => {
   const records = new Map<string, Map<string, Readonly<Response>>>()
   const opened: Array<{ bucketName: string; options: Readonly<StorageBucketOptions> }> = []
   const navigator = {
@@ -67,13 +67,14 @@ await test('cache items preserve raw text and headers in the selected storage bu
   }
   await withGlobals({ navigator }, async () => {
     const options = { expires: 1234, quota: 1024 }
+    const bytes = Uint8Array.of(0, 255, 128, 65)
     assert.deepEqual(
-      await Cache.setCacheStorageItem('/readme', '# Hello', 'extensions', { 'Content-Type': 'text/markdown' }, 'extension-cache', options),
+      await Cache.setCacheStorageItem('/readme', bytes, 'extensions', { 'Content-Type': 'application/octet-stream' }, 'extension-cache', options),
       { success: true },
     )
     assert.deepEqual(await Cache.getCacheStorageItem('/readme', 'extensions', 'extension-cache', options), {
-      body: '# Hello',
-      headers: { 'content-type': 'text/markdown' },
+      body: bytes.buffer,
+      headers: { 'content-type': 'application/octet-stream' },
       status: 200,
       statusText: '',
     })
