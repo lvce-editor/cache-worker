@@ -1,7 +1,7 @@
-import assert from 'node:assert/strict'
-import { MessageChannel } from 'node:worker_threads'
-import test from 'node:test'
 import { MessagePortRpcParent } from '@lvce-editor/rpc'
+import assert from 'node:assert/strict'
+import test from 'node:test'
+import { MessageChannel } from 'node:worker_threads'
 import * as CommandMap from '../src/parts/CommandMap/CommandMap.ts'
 import * as Listen from '../src/parts/Listen/Listen.ts'
 
@@ -12,8 +12,10 @@ await test('handles cache operations over a transferred message port', async () 
     configurable: true,
     value: {
       open: async () => ({
-        match: async (request: string) => entries.get(request)?.clone(),
-        put: async (request: string, response: Response) => entries.set(request, response.clone()),
+        match: async (request: string): Promise<Response | undefined> => entries.get(request)?.clone(),
+        put: async (request: string, response: Response): Promise<void> => {
+          entries.set(request, response.clone())
+        },
       }),
     },
   })
@@ -28,12 +30,12 @@ await test('handles cache operations over a transferred message port', async () 
     assert.equal(cached.body, '# Cached markdown')
     assert.equal(cached.status, 200)
   } finally {
-    parentRpc.dispose()
+    await parentRpc.dispose()
     port2.close()
     if (originalCaches) {
       Object.defineProperty(globalThis, 'caches', originalCaches)
     } else {
-      Reflect.deleteProperty(globalThis, 'caches')
+      Object.defineProperty(globalThis, 'caches', { configurable: true, value: undefined })
     }
   }
 })

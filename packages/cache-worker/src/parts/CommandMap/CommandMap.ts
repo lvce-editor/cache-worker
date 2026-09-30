@@ -4,10 +4,10 @@ import * as Listen from '../Listen/Listen.ts'
 import * as Opfs from '../Opfs/Opfs.ts'
 
 export const commandMap = {
-  'CacheWorker.handleMessagePort': Listen.handleMessagePort,
   'Cache.getCacheStorageItem': Cache.getCacheStorageItem,
   'Cache.removeCacheStorageItem': Cache.removeCacheStorageItem,
   'Cache.setCacheStorageItem': Cache.setCacheStorageItem,
+  'CacheWorker.handleMessagePort': Listen.handleMessagePort,
   'IndexedDb.addIndexedDbFileHandle': IndexedDb.addIndexedDbFileHandle,
   'IndexedDb.getIndexedDbFileHandle': IndexedDb.getIndexedDbFileHandle,
   'IndexedDb.removeIndexedDbFileHandle': IndexedDb.removeIndexedDbFileHandle,
