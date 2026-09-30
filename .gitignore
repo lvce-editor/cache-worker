@@ -1,5 +1,6 @@
 node_modules/
 .tmp/
+/packages/e2e/src/*.js
 playwright-report/
 test-results/
 *.tsbuildinfo

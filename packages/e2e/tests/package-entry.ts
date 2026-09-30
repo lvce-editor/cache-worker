@@ -1,7 +1,7 @@
-import { assertEqual, createRpc } from './_helpers.js'
-
-export const test = async () => {
-  const { getCacheWorkerUrl } = await import('./.tmp/index.js')
+export const test = async (): Promise<void> => {
+  const { assertEqual, createRpc } = await import('./_helpers.ts')
+  const packageModuleUrl = new URL('.tmp/index.js', import.meta.url)
+  const { getCacheWorkerUrl } = await import(packageModuleUrl.href)
   const cacheName = `cache-worker-${crypto.randomUUID()}`
   const rpc = await createRpc(getCacheWorkerUrl())
   try {

@@ -1,6 +1,5 @@
-import { assertEqual, createRpc } from './_helpers.js'
-
-export const test = async () => {
+export const test = async (): Promise<void> => {
+  const { assertEqual, createRpc } = await import('./_helpers.ts')
   const rpc = await createRpc()
   const name = `cache-worker-${crypto.randomUUID()}.txt`
   let text
