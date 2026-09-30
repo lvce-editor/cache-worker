@@ -1,0 +1,9 @@
+{
+  "name": "@lvce-editor/cache-worker-e2e-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@lvce-editor/server": "0.117.6"
+  }
+}
