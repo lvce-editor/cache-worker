@@ -3,7 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "scripts": {
+    "e2e": "test-with-playwright",
+    "e2e:firefox:headless": "test-with-playwright --headless --browser=firefox",
+    "e2e:headless": "test-with-playwright --headless"
+  },
   "dependencies": {
     "@lvce-editor/rpc": "^6.21.1"
+  },
+  "devDependencies": {
+    "@lvce-editor/test-with-playwright": "^22.38.2"
   }
 }

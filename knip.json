@@ -13,8 +13,12 @@
       "project": ["src/**/*.js"]
     },
     "packages/e2e": {
-      "entry": ["playwright.config.js", "server.js", "src/rpcClient.js", "test/**/*.spec.js"],
-      "project": ["*.js", "src/**/*.js", "test/**/*.js"]
+      "entry": ["e2e.config.js", "src/**/*.js"],
+      "project": ["*.js", "src/**/*.js"]
+    },
+    "packages/server": {
+      "entry": ["src/server.js"],
+      "project": ["src/**/*.js"]
     }
   }
 }

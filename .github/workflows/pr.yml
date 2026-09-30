@@ -60,4 +60,4 @@ jobs:
         if: steps.npm-cache.outputs.cache-hit != 'true'
       - run: npm run build
       - run: npx playwright install --with-deps ${{ matrix.browser }}
-      - run: npm run e2e -- --project=${{ matrix.browser }}
+      - run: npm run e2e:headless -- --browser=${{ matrix.browser }}
