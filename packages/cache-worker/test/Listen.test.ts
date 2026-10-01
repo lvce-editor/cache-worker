@@ -4,7 +4,7 @@ import { MessageChannel } from 'node:worker_threads'
 import * as CommandMap from '../src/parts/CommandMap/CommandMap.ts'
 import * as Listen from '../src/parts/Listen/Listen.ts'
 
-test('handles cache operations over a transferred message port', async () => {
+test.each(['initialize', 'CacheWorker.handleMessagePort'] as const)('handles cache operations through %s', async (command) => {
   const originalCaches = Object.getOwnPropertyDescriptor(globalThis, 'caches')
   const entries = new Map<string, Response>()
   Object.defineProperty(globalThis, 'caches', {
@@ -21,7 +21,9 @@ test('handles cache operations over a transferred message port', async () => {
   const { port1, port2 } = new MessageChannel()
   const [parentRpc] = await Promise.all([
     MessagePortRpcParent.create({ commandMap: {}, messagePort: port1 as unknown as MessagePort }),
-    Listen.handleMessagePort(port2 as unknown as MessagePort),
+    command === 'initialize'
+      ? CommandMap.commandMap.initialize('message-port', port2 as unknown as MessagePort)
+      : Listen.handleMessagePort(port2 as unknown as MessagePort),
   ])
   try {
     await parentRpc.invoke('Cache.setCacheStorageItem', '/readme', '# Cached markdown', 'extension-detail-test')
@@ -36,6 +38,18 @@ test('handles cache operations over a transferred message port', async () => {
     } else {
       delete (globalThis as Record<string, unknown>).caches
     }
+  }
+})
+
+test('rejects unsupported initialization transports', async () => {
+  const { port1, port2 } = new MessageChannel()
+  try {
+    await expect(CommandMap.commandMap.initialize('unsupported', port2 as unknown as MessagePort)).rejects.toThrow(
+      'unsupported initialize type unsupported',
+    )
+  } finally {
+    port1.close()
+    port2.close()
   }
 })
 
