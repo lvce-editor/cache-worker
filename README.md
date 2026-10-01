@@ -36,6 +36,8 @@ The worker registers the commands in `src/parts/CommandMap/CommandMap.js`. `Resp
 
 This repository uses npm workspaces and a root `package-lock.json`.
 
+Run `npm run dev` to build the worker assets and start the development test server.
+
 The cross-browser suite checks Cache Storage and OPFS through worker RPC in Chromium, Firefox, and WebKit. IndexedDB file-handle restoration is covered in Firefox; Chromium checks general structured-clone persistence. WebKit runs in CI as advisory coverage because some e2e tests may not pass there yet.
 
 ```sh
