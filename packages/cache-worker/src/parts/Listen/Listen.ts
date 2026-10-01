@@ -11,3 +11,10 @@ export const handleMessagePort = async (messagePort: MessagePort): Promise<void>
     messagePort,
   })
 }
+
+export const initialize = async (type: string, messagePort: MessagePort): Promise<void> => {
+  if (type !== 'message-port') {
+    throw new Error(`unsupported initialize type ${type}`)
+  }
+  await handleMessagePort(messagePort)
+}
