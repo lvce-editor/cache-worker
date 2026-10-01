@@ -40,7 +40,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        browser: [chromium, firefox]
+        browser: [chromium, firefox, webkit]
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
@@ -61,4 +61,6 @@ jobs:
         if: steps.npm-cache.outputs.cache-hit != 'true'
       - run: npm run build
       - run: npx playwright install --with-deps ${{ matrix.browser }}
-      - run: npm run e2e:headless -- --browser=${{ matrix.browser }}
+      - name: Run e2e tests
+        run: npm run e2e:headless -- --browser=${{ matrix.browser }}
+        continue-on-error: ${{ matrix.browser == 'webkit' }}
