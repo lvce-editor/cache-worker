@@ -35,32 +35,29 @@ jobs:
       - run: npm run type-check
       - run: npm run build
       - run: npm run lint
-
-  e2e:
-    strategy:
-      fail-fast: false
-      matrix:
-        browser: [chromium, firefox, webkit]
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
-        with:
-          node-version-file: .nvmrc
-      - name: Compute node modules cache key
-        id: nodeModulesCacheKey
-        run: echo "value=$(node packages/build/src/computeNodeModulesCacheKey.ts)" >> $GITHUB_OUTPUT
-        shell: bash
-      - uses: actions/cache@v6
-        id: npm-cache
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-${{ runner.arch }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
-      - name: npm ci
-        run: npm ci
-        if: steps.npm-cache.outputs.cache-hit != 'true'
-      - run: npm run build
-      - run: npx playwright install --with-deps ${{ matrix.browser }}
-      - name: Run e2e tests
-        run: npm run e2e:headless -- --browser=${{ matrix.browser }}
-        continue-on-error: ${{ matrix.browser == 'webkit' }}
+      - name: Install Playwright system dependencies
+        if: runner.os == 'Linux'
+        working-directory: ./packages/e2e
+        run: npx playwright install-deps chromium firefox webkit
+      - name: Install Playwright browsers
+        working-directory: ./packages/e2e
+        run: npx playwright install chromium firefox webkit
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: 0
+      - name: e2e Chromium
+        working-directory: ./packages/e2e
+        run: npm run e2e:headless
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: 0
+      - name: e2e Firefox
+        working-directory: ./packages/e2e
+        run: npm run e2e:firefox:headless
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: 0
+      - name: e2e WebKit
+        if: runner.os == 'Linux'
+        working-directory: ./packages/e2e
+        run: npm run e2e:headless -- --browser=webkit
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: 0
+        continue-on-error: true
