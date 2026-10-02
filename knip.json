@@ -13,8 +13,8 @@
       "project": ["src/**/*.ts", "test/**/*.ts"]
     },
     "packages/e2e": {
-      "entry": ["tests/**/*.ts"],
-      "project": ["tests/**/*.ts"]
+      "entry": ["src/**/*.ts"],
+      "project": ["src/**/*.ts"]
     },
     "packages/server": {
       "entry": ["src/**/*.ts"],
