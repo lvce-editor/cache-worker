@@ -17,15 +17,15 @@
     "type-check": "tsc -b"
   },
   "devDependencies": {
-    "@jest/globals": "^30.4.1",
-    "@lvce-editor/eslint-config": "^16.3.0",
+    "@jest/globals": "^30.5.2",
+    "@lvce-editor/eslint-config": "^18.14.2",
     "@types/node": "^26.0.1",
-    "esbuild": "^0.28.0",
-    "eslint": "^10.7.0",
-    "jest": "^30.4.2",
-    "knip": "^6.38.0",
-    "prettier": "^3.8.3",
-    "ts-jest": "^29.4.10",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.11.0",
+    "jest": "^30.5.2",
+    "knip": "^6.39.0",
+    "prettier": "^3.9.9",
+    "ts-jest": "^29.4.14",
     "typescript": "^6.0.3"
   },
   "jest": {
