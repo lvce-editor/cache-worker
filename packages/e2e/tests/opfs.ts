@@ -1,7 +1,9 @@
-export const test = async (): Promise<void> => {
-  const { assertEqual, createCacheWorker } = await import('./_helpers.ts')
-  const cacheWorker = await createCacheWorker(new URL('.tmp/cacheWorkerMain.js', import.meta.url))
-  const name = `cache-worker-${crypto.randomUUID()}.txt`
+import type { Test } from '@lvce-editor/test-with-playwright'
+
+export const test: Test = async ({ CacheWorker, Randomization }) => {
+  const { assertEqual } = await import('./_helpers.ts')
+  const cacheWorker = await CacheWorker.create(new URL('.tmp/cacheWorkerMain.js', import.meta.url))
+  const name = `cache-worker-${Randomization.getRandomUUID()}.txt`
   let text
   let traversalRejected = false
   try {

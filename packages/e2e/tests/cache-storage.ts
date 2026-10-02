@@ -1,9 +1,11 @@
-export const test = async (): Promise<void> => {
-  const { assertEqual, createCacheWorker } = await import('./_helpers.ts')
-  const cacheName = `cache-worker-${crypto.randomUUID()}`
-  const key = `/cache-worker/${crypto.randomUUID()}`
+import type { Test } from '@lvce-editor/test-with-playwright'
+
+export const test: Test = async ({ CacheWorker, Randomization }) => {
+  const { assertEqual } = await import('./_helpers.ts')
+  const cacheName = `cache-worker-${Randomization.getRandomUUID()}`
+  const key = `/cache-worker/${Randomization.getRandomUUID()}`
   const bytes = Uint8Array.of(0, 255, 128, 65)
-  const cacheWorker = await createCacheWorker(new URL('.tmp/cacheWorkerMain.js', import.meta.url))
+  const cacheWorker = await CacheWorker.create(new URL('.tmp/cacheWorkerMain.js', import.meta.url))
   try {
     const write = await cacheWorker.setCacheStorageItem(key, bytes, cacheName, {
       'Content-Type': 'application/octet-stream',
