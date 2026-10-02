@@ -1,7 +1,5 @@
-import type { Test } from '@lvce-editor/test-with-playwright'
-
-export const test: Test = async ({ CacheWorker, Randomization }) => {
-  const { assertEqual } = await import('./_helpers.ts')
+export const test = async (): Promise<void> => {
+  const { assertEqual, CacheWorker, Randomization } = await import('./_helpers.ts')
   const packageModuleUrl = new URL('.tmp/index.js', import.meta.url)
   const { getCacheWorkerUrl } = await import(packageModuleUrl.href)
   const cacheName = `cache-worker-${Randomization.getRandomUUID()}`

@@ -1,7 +1,5 @@
-import type { Test } from '@lvce-editor/test-with-playwright'
-
-export const test: Test = async ({ CacheWorker, Randomization }) => {
-  const { assertEqual, deleteDatabase } = await import('./_helpers.ts')
+export const test = async (): Promise<void> => {
+  const { assertEqual, CacheWorker, deleteDatabase, Randomization } = await import('./_helpers.ts')
   const databaseName = `cache-worker-${Randomization.getRandomUUID()}`
   let cacheWorker
   let reopened

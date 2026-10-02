@@ -1,8 +1,6 @@
-import type { Test } from '@lvce-editor/test-with-playwright'
-
-export const test: Test = async ({ CacheWorker, Randomization }) => {
+export const test = async (): Promise<void> => {
   const { openDB } = await import('idb')
-  const { assertEqual, deleteDatabase } = await import('./_helpers.ts')
+  const { assertEqual, CacheWorker, deleteDatabase, Randomization } = await import('./_helpers.ts')
   const databaseName = `cache-worker-${Randomization.getRandomUUID()}`
   const isChromium = navigator.userAgent.includes('Chrome/')
   const database = await openDB(databaseName, 1, {
