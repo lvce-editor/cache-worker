@@ -1,4 +1,5 @@
-export { create as createCacheWorker } from '@lvce-editor/test-worker/cacheWorker'
+export * as CacheWorker from '@lvce-editor/test-worker/cacheWorker'
+export * as Randomization from '@lvce-editor/test-worker/randomization'
 
 export const assertEqual = (actual: unknown, expected: unknown, message: string): void => {
   const actualJson = JSON.stringify(actual)
