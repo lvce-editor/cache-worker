@@ -6,6 +6,7 @@ test('registers the documented storage commands for worker RPC', (): void => {
     'Cache.getCacheStorageItem',
     'Cache.removeCacheStorageItem',
     'Cache.setCacheStorageItem',
+    'CacheWorker.handleExtensionMessagePort',
     'CacheWorker.handleMessagePort',
     'IndexedDb.addIndexedDbFileHandle',
     'IndexedDb.getIndexedDbFileHandle',
