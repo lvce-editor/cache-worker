@@ -12,8 +12,7 @@ interface SyncFileHandle extends FileSystemFileHandle {
 }
 
 export const test = async (): Promise<void> => {
-  const { ModuleWorkerRpcParent } = await import('@lvce-editor/rpc')
-  const { assertEqual, Randomization } = await import('./_helpers.ts')
+  const { assertEqual, ModuleWorkerRpcParent, Randomization } = await import('./_helpers.ts')
   const namespace = `test-${Randomization.getRandomUUID()}`
   const rpc = await ModuleWorkerRpcParent.create({ commandMap: {}, url: new URL('.tmp/cacheWorkerMain.js', import.meta.url).href })
   let access: SyncHandle | undefined

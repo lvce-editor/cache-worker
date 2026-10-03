@@ -1,3 +1,4 @@
+export { ModuleWorkerRpcParent } from '@lvce-editor/rpc'
 export * as CacheWorker from '@lvce-editor/test-worker/cacheWorker'
 export * as Randomization from '@lvce-editor/test-worker/randomization'
 
