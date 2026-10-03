@@ -11,6 +11,7 @@ test('registers the documented storage commands for worker RPC', (): void => {
     'IndexedDb.getIndexedDbFileHandle',
     'IndexedDb.removeIndexedDbFileHandle',
     'initialize',
+    'Opfs.getCacheFileHandle',
     'Opfs.readFile',
     'Opfs.removeFile',
     'Opfs.writeFile',

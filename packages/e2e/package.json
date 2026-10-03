@@ -10,6 +10,7 @@
     "type-check": "tsc"
   },
   "devDependencies": {
+    "@lvce-editor/rpc": "^6.21.1",
     "@lvce-editor/test-with-playwright": "^22.38.2",
     "@lvce-editor/test-worker": "^17.27.9",
     "idb": "^8.0.3"

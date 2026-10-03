@@ -15,6 +15,7 @@ export const commandMap = {
   'IndexedDb.getIndexedDbFileHandle': IndexedDb.getIndexedDbFileHandle,
   'IndexedDb.removeIndexedDbFileHandle': IndexedDb.removeIndexedDbFileHandle,
   initialize,
+  'Opfs.getCacheFileHandle': Opfs.getCacheFileHandle,
   'Opfs.readFile': Opfs.readFile,
   'Opfs.removeFile': Opfs.removeFile,
   'Opfs.writeFile': Opfs.writeFile,
