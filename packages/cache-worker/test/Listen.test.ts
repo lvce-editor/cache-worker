@@ -53,6 +53,64 @@ test('rejects unsupported initialization transports', async () => {
   }
 })
 
+test('keeps extension cache operations isolated while preserving Blob data and headers', async () => {
+  const originalCaches = Object.getOwnPropertyDescriptor(globalThis, 'caches')
+  const cacheStorage = new Map<string, Map<string, Response>>()
+  const openedCacheNames: string[] = []
+  Object.defineProperty(globalThis, 'caches', {
+    configurable: true,
+    value: {
+      open: async (cacheName: string) => {
+        openedCacheNames.push(cacheName)
+        let cache = cacheStorage.get(cacheName)
+        if (!cache) {
+          cache = new Map()
+          cacheStorage.set(cacheName, cache)
+        }
+        return {
+          match: async (request: string): Promise<Response | undefined> => cache?.get(request)?.clone(),
+          put: async (request: string, response: Response): Promise<void> => {
+            cache?.set(request, response.clone())
+          },
+        }
+      },
+    },
+  })
+  const channels = [new MessageChannel(), new MessageChannel()]
+  const [firstChannel, secondChannel] = channels
+  const [firstRpc, secondRpc] = await Promise.all([
+    MessagePortRpcParent.create({ commandMap: {}, messagePort: firstChannel.port1 as unknown as MessagePort }),
+    MessagePortRpcParent.create({ commandMap: {}, messagePort: secondChannel.port1 as unknown as MessagePort }),
+    Listen.handleExtensionMessagePort(firstChannel.port2 as unknown as MessagePort, 'first.extension'),
+    Listen.handleExtensionMessagePort(secondChannel.port2 as unknown as MessagePort, 'second.extension'),
+  ])
+  try {
+    const blob = new Blob(['image-bytes'], { type: 'image/webp' })
+    const key = 'same-item-key'
+    await firstRpc.invoke('ExtensionsCache.setCacheStorageItem', key, blob, { 'Content-Type': blob.type, 'X-Image-Width': '120' })
+    expect(cacheStorage.has('lvce-extension-first.extension')).toBe(true)
+    expect(await secondRpc.invoke('ExtensionsCache.getCacheStorageItem', key)).toBeNull()
+    expect(openedCacheNames).toEqual(['lvce-extension-first.extension', 'lvce-extension-second.extension'])
+    const item = await firstRpc.invoke('ExtensionsCache.getCacheStorageItem', key)
+    expect(new Blob([item.body], { type: item.headers['content-type'] }).type).toBe('image/webp')
+    expect(new TextDecoder().decode(item.body)).toBe('image-bytes')
+    expect(item.headers['x-image-width']).toBe('120')
+    await expect(firstRpc.invoke('Cache.getCacheStorageItem', key)).rejects.toThrow()
+  } finally {
+    await Promise.all([firstRpc.dispose(), secondRpc.dispose()])
+    for (const channel of channels) {
+      channel.port1.close()
+      channel.port2.close()
+    }
+    if (originalCaches) {
+      Object.defineProperty(globalThis, 'caches', originalCaches)
+    } else {
+      delete (globalThis as Record<string, unknown>).caches
+    }
+  }
+})
+
 test('registers the message-port receiver as an internal worker command', () => {
   expect(typeof CommandMap.commandMap['CacheWorker.handleMessagePort']).toBe('function')
+  expect(typeof CommandMap.commandMap['CacheWorker.handleExtensionMessagePort']).toBe('function')
 })
