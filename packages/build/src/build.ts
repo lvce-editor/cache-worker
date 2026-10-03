@@ -29,6 +29,7 @@ await build({
     'packages/e2e/src/indexed-db-delete.ts',
     'packages/e2e/src/indexed-db.ts',
     'packages/e2e/src/opfs.ts',
+    'packages/e2e/src/opfs-cache-handle.ts',
     'packages/e2e/src/package-entry.ts',
   ],
   bundle: true,

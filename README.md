@@ -48,3 +48,20 @@ npm run e2e -- --browser=webkit
 ```
 
 The browser suite runs against Chromium, Firefox, and WebKit. Install them with `npx playwright install --with-deps chromium firefox webkit`.
+
+### Synchronous cache clients
+
+`Opfs.getCacheFileHandle(namespace, name)` returns a structured-cloneable
+`FileSystemFileHandle` beneath `lvce-extension-caches/<namespace>/<name>`.
+Both components must contain 1–80 lowercase ASCII letters, digits or hyphens,
+starting with a letter or digit. Reopening the same pair preserves its contents;
+separate namespaces do not share files. This directory avoids the root-level
+files used by synchronous RPC.
+
+A dedicated worker can call `createSyncAccessHandle()` on the returned handle.
+The client owns that handle and must close it, including on failure and disposal.
+Use the default exclusive lock: concurrent clients that cannot acquire it should
+fall back to uncached reads. Cache-worker itself opens no access handles. The
+client remains responsible for size limits, its on-disk format, corruption
+validation, invalidation and crash recovery. This command does not authenticate
+extensions or isolate mutually untrusted code within an origin.
