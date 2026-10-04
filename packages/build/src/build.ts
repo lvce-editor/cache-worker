@@ -4,7 +4,7 @@ import { bundleJs } from './bundleJs.ts'
 import { getVersion } from './version.ts'
 
 await rm('.tmp/dist', { force: true, recursive: true })
-await rm('packages/e2e/src', { force: true, recursive: true })
+await rm('packages/e2e/.tmp', { force: true, recursive: true })
 await mkdir('.tmp/dist', { recursive: true })
 await bundleJs('packages/cache-worker/src/cacheWorkerMain.ts', '.tmp/dist/cacheWorkerMain.js')
 await bundleJs('packages/cache-worker/src/index.ts', '.tmp/dist/index.js')
@@ -19,21 +19,22 @@ packageJson.exports = {
   './cacheWorkerMain.js': './cacheWorkerMain.js',
 }
 await writeFile('.tmp/dist/package.json', `${JSON.stringify(packageJson, null, 2)}\n`)
-await mkdir('packages/e2e/src/.tmp', { recursive: true })
-await cp('.tmp/dist/cacheWorkerMain.js', 'packages/e2e/src/.tmp/cacheWorkerMain.js')
-await cp('.tmp/dist/index.js', 'packages/e2e/src/.tmp/index.js')
+await mkdir('packages/e2e/.tmp/src/.tmp', { recursive: true })
+await cp('.tmp/dist/cacheWorkerMain.js', 'packages/e2e/.tmp/src/.tmp/cacheWorkerMain.js')
+await cp('.tmp/dist/index.js', 'packages/e2e/.tmp/src/.tmp/index.js')
 await build({
   entryPoints: [
-    'packages/e2e/tests/cache-storage-error.ts',
-    'packages/e2e/tests/cache-storage.ts',
-    'packages/e2e/tests/indexed-db-delete.ts',
-    'packages/e2e/tests/indexed-db.ts',
-    'packages/e2e/tests/opfs.ts',
-    'packages/e2e/tests/package-entry.ts',
+    'packages/e2e/src/cache-storage-error.ts',
+    'packages/e2e/src/cache-storage.ts',
+    'packages/e2e/src/indexed-db-delete.ts',
+    'packages/e2e/src/indexed-db.ts',
+    'packages/e2e/src/opfs.ts',
+    'packages/e2e/src/opfs-cache-handle.ts',
+    'packages/e2e/src/package-entry.ts',
   ],
   bundle: true,
   entryNames: '[name]',
-  outdir: 'packages/e2e/src',
+  outdir: 'packages/e2e/.tmp/src',
   format: 'esm',
   platform: 'browser',
   target: ['es2022'],

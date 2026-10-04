@@ -10,7 +10,7 @@ const contentTypes = {
 
 createServer((request, response) => {
   const pathname = new URL(request.url, 'http://localhost').pathname
-  const file = resolve(root, pathname.slice(1) || 'packages/e2e/test/index.html')
+  const file = resolve(root, pathname.slice(1))
   if (file !== root && !file.startsWith(`${root}${sep}`)) {
     response.writeHead(403).end()
     return

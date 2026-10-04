@@ -1,7 +1,7 @@
 export const test = async (): Promise<void> => {
   const { openDB } = await import('idb')
-  const { assertEqual, createCacheWorker, deleteDatabase } = await import('./_helpers.ts')
-  const databaseName = `cache-worker-${crypto.randomUUID()}`
+  const { assertEqual, CacheWorker, deleteDatabase, Randomization } = await import('./_helpers.ts')
+  const databaseName = `cache-worker-${Randomization.getRandomUUID()}`
   const isChromium = navigator.userAgent.includes('Chrome/')
   const database = await openDB(databaseName, 1, {
     upgrade(
@@ -15,7 +15,7 @@ export const test = async (): Promise<void> => {
   })
   await database.put('file-handles', { name: 'existing-value' }, 'existing-key')
   database.close()
-  const cacheWorker = await createCacheWorker(new URL('.tmp/cacheWorkerMain.js', import.meta.url))
+  const cacheWorker = await CacheWorker.create(new URL('.tmp/cacheWorkerMain.js', import.meta.url))
   let root: FileSystemDirectoryHandle | undefined
   let handleName: string | undefined
   try {
@@ -29,7 +29,7 @@ export const test = async (): Promise<void> => {
       return
     }
     root = await navigator.storage.getDirectory()
-    handleName = `handle-${crypto.randomUUID()}`
+    handleName = `handle-${Randomization.getRandomUUID()}`
     const handle = await root.getFileHandle(handleName, { create: true })
     await cacheWorker.addIndexedDbFileHandle('file', handle, databaseName)
     const restored = (await cacheWorker.getIndexedDbFileHandle('file', databaseName)) as FileSystemFileHandle

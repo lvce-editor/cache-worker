@@ -15,6 +15,22 @@ const validateName = (name: string): void => {
   }
 }
 
+// Keep extension caches separate from the root-level OPFS RPC scratch files.
+// The returned handle is cloneable, not transferable. The receiving dedicated
+// worker owns its access handle and must close it when finished. This worker
+// deliberately never opens an access handle or chooses an unsafe locking mode.
+export const getCacheFileHandle = async (namespace: string, name: string): Promise<FileSystemFileHandle> => {
+  for (const component of [namespace, name]) {
+    if (typeof component !== 'string' || !/^[a-z0-9][a-z0-9-]{0,79}$/.test(component)) {
+      throw new TypeError('OPFS cache namespace and name must be 1–80 lowercase letters, digits, or hyphens, starting with a letter or digit')
+    }
+  }
+  const root = await getRoot()
+  const caches = await root.getDirectoryHandle('lvce-extension-caches', { create: true })
+  const directory = await caches.getDirectoryHandle(namespace, { create: true })
+  return directory.getFileHandle(name, { create: true })
+}
+
 export const readFile = async (name: string): Promise<string> => {
   validateName(name)
   const root = await getRoot()
