@@ -15,7 +15,7 @@
     "./cacheWorkerMain.js": "./src/cacheWorkerMain.ts"
   },
   "dependencies": {
-    "@lvce-editor/rpc": "^6.4.0",
+    "@lvce-editor/rpc": "^6.21.1",
     "idb": "^8.0.3"
   }
 }
