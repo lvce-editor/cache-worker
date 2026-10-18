@@ -122,3 +122,69 @@ test('cache write failures are returned as error values', async (): Promise<void
     },
   )
 })
+
+test('JSON cache items round trip JSON values and distinguish null from a miss', async (): Promise<void> => {
+  const entries = new Map<string, Readonly<Response>>()
+  const cache = {
+    async match(request: string): Promise<Readonly<Response> | undefined> {
+      return entries.get(request)
+    },
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- Cache.put receives a native Response value.
+    async put(request: string, response: Readonly<Response>): Promise<void> {
+      entries.set(request, response)
+    },
+  }
+  await withGlobals(
+    {
+      caches: {
+        async open(): Promise<typeof cache> {
+          return cache
+        },
+      },
+    },
+    async () => {
+      const values: readonly unknown[] = [{ nested: [true, 3, null], title: 'café ☕' }, ['array', 2], 'text', 42, false, null]
+      for (const [index, value] of values.entries()) {
+        expect(await Cache.setCacheStorageJsonItem(`/json/${index}`, value)).toEqual({ success: true })
+        expect(await Cache.getCacheStorageJsonItem(`/json/${index}`)).toEqual({ value })
+        expect(entries.get(`/json/${index}`)?.headers.get('content-type')).toBe('application/json')
+      }
+      expect(await Cache.getCacheStorageJsonItem('/missing')).toBeNull()
+    },
+  )
+})
+
+test('JSON cache reads reject malformed JSON and writes report serialization failures', async (): Promise<void> => {
+  const entries = new Map<string, Readonly<Response>>()
+  const cache = {
+    async match(request: string): Promise<Readonly<Response> | undefined> {
+      return entries.get(request)
+    },
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- Cache.put receives a native Response value.
+    async put(request: string, response: Readonly<Response>): Promise<void> {
+      entries.set(request, response)
+    },
+  }
+  await withGlobals(
+    {
+      caches: {
+        async open(): Promise<typeof cache> {
+          return cache
+        },
+      },
+    },
+    async () => {
+      entries.set('/invalid', new Response('{'))
+      await expect(Cache.getCacheStorageJsonItem('/invalid')).rejects.toThrow(SyntaxError)
+      expect(await Cache.setCacheStorageJsonItem('/undefined', undefined)).toEqual({
+        errorCode: 'CACHE_STORAGE_WRITE_FAILED',
+        errorMessage: 'Value is not JSON serializable',
+        success: false,
+      })
+      const circular: { self?: unknown } = {}
+      circular.self = circular
+      const circularWrite = await Cache.setCacheStorageJsonItem('/circular', circular)
+      expect(circularWrite.success).toBe(false)
+    },
+  )
+})

@@ -6,7 +6,9 @@ Browser storage APIs for LVCE workers. `@lvce-editor/cache-worker` provides Cach
 
 | Command                               | Arguments                                           | Result                                                                                                               |
 | ------------------------------------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `Cache.getCacheStorageJsonItem`       | `(request, cacheName = 'lvce-cache')`               | `{ value }` containing parsed JSON, or `null` when missing; malformed JSON rejects                                   |
 | `Cache.getCacheStorageItem`           | `(request, cacheName = 'lvce-cache')`               | Structured-cloneable `{ body: ArrayBuffer, headers: [string, string][], status, statusText }` or `null` when missing |
+| `Cache.setCacheStorageJsonItem`       | `(request, value, cacheName = 'lvce-cache')`        | Existing cache write result; serializes JSON and reports unsupported values as write failures                        |
 | `Cache.setCacheStorageItem`           | `(request, value, cacheName = 'lvce-cache')`        | `undefined`; stores a body accepted by the browser `Response` constructor                                            |
 | `Cache.removeCacheStorageItem`        | `(request, cacheName = 'lvce-cache')`               | `boolean` indicating whether an item was removed                                                                     |
 | `IndexedDb.addIndexedDbFileHandle`    | `(key, handle, databaseName = 'lvce-cache-worker')` | `undefined` after the write transaction commits                                                                      |
