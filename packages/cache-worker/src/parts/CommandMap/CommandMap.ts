@@ -10,8 +10,10 @@ const initialize = (type: string, messagePort: MessagePort): Promise<void> => Li
 
 export const commandMap = {
   'Cache.getCacheStorageItem': Cache.getCacheStorageItem,
+  'Cache.getCacheStorageJsonItem': Cache.getCacheStorageJsonItem,
   'Cache.removeCacheStorageItem': Cache.removeCacheStorageItem,
   'Cache.setCacheStorageItem': Cache.setCacheStorageItem,
+  'Cache.setCacheStorageJsonItem': Cache.setCacheStorageJsonItem,
   'CacheWorker.handleExtensionMessagePort': handleExtensionMessagePort,
   'CacheWorker.handleMessagePort': handleMessagePort,
   'IndexedDb.addIndexedDbFileHandle': IndexedDb.addIndexedDbFileHandle,
