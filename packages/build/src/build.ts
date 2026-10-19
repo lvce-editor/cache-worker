@@ -19,9 +19,9 @@ packageJson.exports = {
   './cacheWorkerMain.js': './cacheWorkerMain.js',
 }
 await writeFile('.tmp/dist/package.json', `${JSON.stringify(packageJson, null, 2)}\n`)
-await mkdir('packages/e2e/.tmp/src', { recursive: true })
-await cp('.tmp/dist/cacheWorkerMain.js', 'packages/e2e/.tmp/src/cacheWorkerMain.js')
-await cp('.tmp/dist/index.js', 'packages/e2e/.tmp/src/index.js')
+await mkdir('packages/e2e/.tmp/src/assets', { recursive: true })
+await cp('.tmp/dist/cacheWorkerMain.js', 'packages/e2e/.tmp/src/assets/cacheWorkerMain.js')
+await cp('.tmp/dist/index.js', 'packages/e2e/.tmp/src/assets/index.js')
 await build({
   entryPoints: [
     'packages/e2e/src/cache-storage-error.ts',

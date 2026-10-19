@@ -5,8 +5,8 @@ export const test = async (): Promise<void> => {
   const jsonKey = `${key}/json`
   const jsonValue = { labels: ['café ☕', 'LVCE'], nested: [1, true, null] }
   const bytes = Uint8Array.of(0, 255, 128, 65)
-  const cacheWorker = await CacheWorker.create(new URL('cacheWorkerMain.js', import.meta.url))
-  const jsonRpc = await ModuleWorkerRpcParent.create({ commandMap: {}, url: new URL('cacheWorkerMain.js', import.meta.url).href })
+  const cacheWorker = await CacheWorker.create(new URL('assets/cacheWorkerMain.js', import.meta.url))
+  const jsonRpc = await ModuleWorkerRpcParent.create({ commandMap: {}, url: new URL('assets/cacheWorkerMain.js', import.meta.url).href })
   try {
     const write = await cacheWorker.setCacheStorageItem(key, bytes, cacheName, {
       'Content-Type': 'application/octet-stream',

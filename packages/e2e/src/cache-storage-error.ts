@@ -1,7 +1,7 @@
 export const test = async (): Promise<void> => {
   const { assertEqual, CacheWorker, Randomization } = await import('./_helpers.ts')
   const cacheName = `cache-worker-${Randomization.getRandomUUID()}`
-  const cacheWorker = await CacheWorker.create(new URL('cacheWorkerMain.js', import.meta.url))
+  const cacheWorker = await CacheWorker.create(new URL('assets/cacheWorkerMain.js', import.meta.url))
   try {
     const result = await cacheWorker.setCacheStorageItem('/invalid-header', 'text', cacheName, {
       'Bad Header': 'value',
