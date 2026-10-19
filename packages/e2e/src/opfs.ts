@@ -1,6 +1,6 @@
 export const test = async (): Promise<void> => {
   const { assertEqual, CacheWorker, Randomization } = await import('./_helpers.ts')
-  const cacheWorker = await CacheWorker.create(new URL('.tmp/cacheWorkerMain.js', import.meta.url))
+  const cacheWorker = await CacheWorker.create(new URL('cacheWorkerMain.js', import.meta.url))
   const name = `cache-worker-${Randomization.getRandomUUID()}.txt`
   let text
   let traversalRejected = false

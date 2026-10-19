@@ -4,7 +4,7 @@ export const test = async (): Promise<void> => {
   let cacheWorker
   let reopened
   try {
-    cacheWorker = await CacheWorker.create(new URL('.tmp/cacheWorkerMain.js', import.meta.url))
+    cacheWorker = await CacheWorker.create(new URL('cacheWorkerMain.js', import.meta.url))
     let rejectedInvalidKey = false
     try {
       await cacheWorker.addIndexedDbFileHandle(NaN, { name: 'invalid' }, databaseName)
@@ -24,7 +24,7 @@ export const test = async (): Promise<void> => {
     const arrayKey = await cacheWorker.getIndexedDbFileHandle([1, 'key'], databaseName)
     await cacheWorker.dispose()
     cacheWorker = undefined
-    reopened = await CacheWorker.create(new URL('.tmp/cacheWorkerMain.js', import.meta.url))
+    reopened = await CacheWorker.create(new URL('cacheWorkerMain.js', import.meta.url))
     const persisted = await reopened.getIndexedDbFileHandle('remove-me', databaseName)
     await reopened.removeIndexedDbFileHandle('missing', databaseName)
     assertEqual(

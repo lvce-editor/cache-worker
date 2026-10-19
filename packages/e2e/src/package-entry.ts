@@ -1,6 +1,6 @@
 export const test = async (): Promise<void> => {
   const { assertEqual, CacheWorker, Randomization } = await import('./_helpers.ts')
-  const packageModuleUrl = new URL('.tmp/index.js', import.meta.url)
+  const packageModuleUrl = new URL('index.js', import.meta.url)
   const { getCacheWorkerUrl } = await import(packageModuleUrl.href)
   const cacheName = `cache-worker-${Randomization.getRandomUUID()}`
   const cacheWorker = await CacheWorker.create(getCacheWorkerUrl())
