@@ -15,7 +15,7 @@ export const test = async (): Promise<void> => {
   })
   await database.put('file-handles', { name: 'existing-value' }, 'existing-key')
   database.close()
-  const cacheWorker = await CacheWorker.create(new URL('.tmp/cacheWorkerMain.js', import.meta.url))
+  const cacheWorker = await CacheWorker.create(new URL('assets/cacheWorkerMain.js', import.meta.url))
   let root: FileSystemDirectoryHandle | undefined
   let handleName: string | undefined
   try {

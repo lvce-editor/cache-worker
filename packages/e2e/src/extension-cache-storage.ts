@@ -6,7 +6,7 @@ export const test = async (): Promise<void> => {
   const regularCacheName = `test-${Randomization.getRandomUUID()}`
   const key = 'same-item-key'
   const bytes = new Blob(['image-bytes'], { type: 'image/webp' })
-  const cacheWorker = await ModuleWorkerRpcParent.create({ commandMap: {}, url: new URL('.tmp/cacheWorkerMain.js', import.meta.url).href })
+  const cacheWorker = await ModuleWorkerRpcParent.create({ commandMap: {}, url: new URL('assets/cacheWorkerMain.js', import.meta.url).href })
   const firstChannel = new MessageChannel()
   const secondChannel = new MessageChannel()
   let firstRpc: Awaited<ReturnType<typeof MessagePortRpcParent.create>> | undefined
