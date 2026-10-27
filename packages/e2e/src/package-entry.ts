@@ -1,11 +1,11 @@
 export const test = async (): Promise<void> => {
-  const { assertEqual, CacheWorker, Randomization } = await import('./_helpers.ts')
+  const { assertEqual, ModuleWorkerRpcParent } = await import('./_helpers.ts')
   const packageModuleUrl = new URL('assets/index.js', import.meta.url)
   const { getCacheWorkerUrl } = await import(packageModuleUrl.href)
-  const cacheName = `cache-worker-${Randomization.getRandomUUID()}`
-  const cacheWorker = await CacheWorker.create(getCacheWorkerUrl())
+  const cacheName = `cache-worker-${crypto.randomUUID()}`
+  const cacheWorker = await ModuleWorkerRpcParent.create({ commandMap: {}, url: getCacheWorkerUrl().href })
   try {
-    const result = await cacheWorker.getCacheStorageItem('/missing', cacheName)
+    const result = await cacheWorker.invoke('Cache.getCacheStorageItem', '/missing', cacheName)
     assertEqual(result, null, 'A missing cache entry should return null')
   } finally {
     await cacheWorker.dispose()

@@ -1,32 +1,32 @@
 export const test = async (): Promise<void> => {
-  const { assertEqual, CacheWorker, deleteDatabase, Randomization } = await import('./_helpers.ts')
-  const databaseName = `cache-worker-${Randomization.getRandomUUID()}`
+  const { assertEqual, deleteDatabase, ModuleWorkerRpcParent } = await import('./_helpers.ts')
+  const databaseName = `cache-worker-${crypto.randomUUID()}`
   let cacheWorker
   let reopened
   try {
-    cacheWorker = await CacheWorker.create(new URL('assets/cacheWorkerMain.js', import.meta.url))
+    cacheWorker = await ModuleWorkerRpcParent.create({ commandMap: {}, url: new URL('assets/cacheWorkerMain.js', import.meta.url).href })
     let rejectedInvalidKey = false
     try {
-      await cacheWorker.addIndexedDbFileHandle(NaN, { name: 'invalid' }, databaseName)
+      await cacheWorker.invoke('IndexedDb.addIndexedDbFileHandle', NaN, { name: 'invalid' }, databaseName)
     } catch {
       rejectedInvalidKey = true
     }
     assertEqual(rejectedInvalidKey, true, 'IndexedDB should reject an invalid key')
-    await cacheWorker.addIndexedDbFileHandle('remove-me', { name: 'removed' }, databaseName)
-    await cacheWorker.addIndexedDbFileHandle('keep-me', { name: 'kept' }, databaseName)
-    await cacheWorker.addIndexedDbFileHandle(42, { name: 'original' }, databaseName)
-    await cacheWorker.addIndexedDbFileHandle(42, { name: 'overwritten' }, databaseName)
-    await cacheWorker.addIndexedDbFileHandle([1, 'key'], { name: 'array-key' }, databaseName)
-    await cacheWorker.removeIndexedDbFileHandle('remove-me', databaseName)
-    const removed = await cacheWorker.getIndexedDbFileHandle('remove-me', databaseName)
-    const kept = await cacheWorker.getIndexedDbFileHandle('keep-me', databaseName)
-    const overwritten = await cacheWorker.getIndexedDbFileHandle(42, databaseName)
-    const arrayKey = await cacheWorker.getIndexedDbFileHandle([1, 'key'], databaseName)
+    await cacheWorker.invoke('IndexedDb.addIndexedDbFileHandle', 'remove-me', { name: 'removed' }, databaseName)
+    await cacheWorker.invoke('IndexedDb.addIndexedDbFileHandle', 'keep-me', { name: 'kept' }, databaseName)
+    await cacheWorker.invoke('IndexedDb.addIndexedDbFileHandle', 42, { name: 'original' }, databaseName)
+    await cacheWorker.invoke('IndexedDb.addIndexedDbFileHandle', 42, { name: 'overwritten' }, databaseName)
+    await cacheWorker.invoke('IndexedDb.addIndexedDbFileHandle', [1, 'key'], { name: 'array-key' }, databaseName)
+    await cacheWorker.invoke('IndexedDb.removeIndexedDbFileHandle', 'remove-me', databaseName)
+    const removed = await cacheWorker.invoke('IndexedDb.getIndexedDbFileHandle', 'remove-me', databaseName)
+    const kept = await cacheWorker.invoke('IndexedDb.getIndexedDbFileHandle', 'keep-me', databaseName)
+    const overwritten = await cacheWorker.invoke('IndexedDb.getIndexedDbFileHandle', 42, databaseName)
+    const arrayKey = await cacheWorker.invoke('IndexedDb.getIndexedDbFileHandle', [1, 'key'], databaseName)
     await cacheWorker.dispose()
     cacheWorker = undefined
-    reopened = await CacheWorker.create(new URL('assets/cacheWorkerMain.js', import.meta.url))
-    const persisted = await reopened.getIndexedDbFileHandle('remove-me', databaseName)
-    await reopened.removeIndexedDbFileHandle('missing', databaseName)
+    reopened = await ModuleWorkerRpcParent.create({ commandMap: {}, url: new URL('assets/cacheWorkerMain.js', import.meta.url).href })
+    const persisted = await reopened.invoke('IndexedDb.getIndexedDbFileHandle', 'remove-me', databaseName)
+    await reopened.invoke('IndexedDb.removeIndexedDbFileHandle', 'missing', databaseName)
     assertEqual(
       {
         arrayKey,

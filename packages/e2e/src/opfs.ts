@@ -1,21 +1,21 @@
 export const test = async (): Promise<void> => {
-  const { assertEqual, CacheWorker, Randomization } = await import('./_helpers.ts')
-  const cacheWorker = await CacheWorker.create(new URL('assets/cacheWorkerMain.js', import.meta.url))
-  const name = `cache-worker-${Randomization.getRandomUUID()}.txt`
+  const { assertEqual, ModuleWorkerRpcParent } = await import('./_helpers.ts')
+  const cacheWorker = await ModuleWorkerRpcParent.create({ commandMap: {}, url: new URL('assets/cacheWorkerMain.js', import.meta.url).href })
+  const name = `cache-worker-${crypto.randomUUID()}.txt`
   let text
   let traversalRejected = false
   try {
-    await cacheWorker.writeFile(name, 'persistent text')
-    text = await cacheWorker.readFile(name)
-    await cacheWorker.removeFile(name)
+    await cacheWorker.invoke('Opfs.writeFile', name, 'persistent text')
+    text = await cacheWorker.invoke('Opfs.readFile', name)
+    await cacheWorker.invoke('Opfs.removeFile', name)
     try {
-      await cacheWorker.readFile('../outside.txt')
+      await cacheWorker.invoke('Opfs.readFile', '../outside.txt')
     } catch (error) {
       traversalRejected = error instanceof TypeError
     }
   } finally {
     try {
-      await cacheWorker.removeFile(name)
+      await cacheWorker.invoke('Opfs.removeFile', name)
     } catch {
       // The file may already have been removed by the scenario.
     }

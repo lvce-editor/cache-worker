@@ -1,9 +1,9 @@
 export const test = async (): Promise<void> => {
-  const { assertEqual, CacheWorker, Randomization } = await import('./_helpers.ts')
-  const cacheName = `cache-worker-${Randomization.getRandomUUID()}`
-  const cacheWorker = await CacheWorker.create(new URL('assets/cacheWorkerMain.js', import.meta.url))
+  const { assertEqual, ModuleWorkerRpcParent } = await import('./_helpers.ts')
+  const cacheName = `cache-worker-${crypto.randomUUID()}`
+  const cacheWorker = await ModuleWorkerRpcParent.create({ commandMap: {}, url: new URL('assets/cacheWorkerMain.js', import.meta.url).href })
   try {
-    const result = await cacheWorker.setCacheStorageItem('/invalid-header', 'text', cacheName, {
+    const result = await cacheWorker.invoke('Cache.setCacheStorageItem', '/invalid-header', 'text', cacheName, {
       'Bad Header': 'value',
     })
     if (result.success || result.errorCode !== 'CACHE_STORAGE_WRITE_FAILED' || !result.errorMessage) {

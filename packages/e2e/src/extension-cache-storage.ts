@@ -1,9 +1,9 @@
 export const test = async (): Promise<void> => {
   const { MessagePortRpcParent } = await import('@lvce-editor/rpc')
-  const { assertEqual, ModuleWorkerRpcParent, Randomization } = await import('./_helpers.ts')
-  const firstExtension = `test-${Randomization.getRandomUUID()}`
-  const secondExtension = `test-${Randomization.getRandomUUID()}`
-  const regularCacheName = `test-${Randomization.getRandomUUID()}`
+  const { assertEqual, ModuleWorkerRpcParent } = await import('./_helpers.ts')
+  const firstExtension = `test-${crypto.randomUUID()}`
+  const secondExtension = `test-${crypto.randomUUID()}`
+  const regularCacheName = `test-${crypto.randomUUID()}`
   const key = 'same-item-key'
   const bytes = new Blob(['image-bytes'], { type: 'image/webp' })
   const cacheWorker = await ModuleWorkerRpcParent.create({ commandMap: {}, url: new URL('assets/cacheWorkerMain.js', import.meta.url).href })
