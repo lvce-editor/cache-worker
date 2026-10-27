@@ -1,22 +1,22 @@
 export const test = async (): Promise<void> => {
-  const { assertEqual, CacheWorker, ModuleWorkerRpcParent, Randomization } = await import('./_helpers.ts')
-  const cacheName = `cache-worker-${Randomization.getRandomUUID()}`
-  const key = `/cache-worker/${Randomization.getRandomUUID()}`
+  const { assertEqual, createCacheWorkerRpc, ModuleWorkerRpcParent } = await import('./_helpers.ts')
+  const cacheName = `cache-worker-${crypto.randomUUID()}`
+  const key = `/cache-worker/${crypto.randomUUID()}`
   const jsonKey = `${key}/json`
   const jsonValue = { labels: ['café ☕', 'LVCE'], nested: [1, true, null] }
   const bytes = Uint8Array.of(0, 255, 128, 65)
-  const cacheWorker = await CacheWorker.create(new URL('assets/cacheWorkerMain.js', import.meta.url))
+  const cacheWorker = await createCacheWorkerRpc(new URL('assets/cacheWorkerMain.js', import.meta.url))
   const jsonRpc = await ModuleWorkerRpcParent.create({ commandMap: {}, url: new URL('assets/cacheWorkerMain.js', import.meta.url).href })
   try {
-    const write = await cacheWorker.setCacheStorageItem(key, bytes, cacheName, {
+    const write = await cacheWorker.invoke('Cache.setCacheStorageItem', key, bytes, cacheName, {
       'Content-Type': 'application/octet-stream',
     })
-    const stored = await cacheWorker.getCacheStorageItem(key, cacheName)
+    const stored = await cacheWorker.invoke('Cache.getCacheStorageItem', key, cacheName)
     if (!stored) {
       throw new Error('Cache Storage item was not found after writing')
     }
-    const removed = await cacheWorker.removeCacheStorageItem(key, cacheName)
-    const missing = await cacheWorker.getCacheStorageItem(key, cacheName)
+    const removed = await cacheWorker.invoke('Cache.removeCacheStorageItem', key, cacheName)
+    const missing = await cacheWorker.invoke('Cache.getCacheStorageItem', key, cacheName)
     const jsonWrite = await jsonRpc.invoke('Cache.setCacheStorageJsonItem', jsonKey, jsonValue, cacheName)
     const storedJson = await jsonRpc.invoke('Cache.getCacheStorageJsonItem', jsonKey, cacheName)
     assertEqual(

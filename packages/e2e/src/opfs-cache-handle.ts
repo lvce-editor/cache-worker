@@ -12,8 +12,8 @@ interface SyncFileHandle extends FileSystemFileHandle {
 }
 
 export const test = async (): Promise<void> => {
-  const { assertEqual, ModuleWorkerRpcParent, Randomization } = await import('./_helpers.ts')
-  const namespace = `test-${Randomization.getRandomUUID()}`
+  const { assertEqual, ModuleWorkerRpcParent } = await import('./_helpers.ts')
+  const namespace = `test-${crypto.randomUUID()}`
   const rpc = await ModuleWorkerRpcParent.create({ commandMap: {}, url: new URL('assets/cacheWorkerMain.js', import.meta.url).href })
   let access: SyncHandle | undefined
   let second: SyncHandle | undefined

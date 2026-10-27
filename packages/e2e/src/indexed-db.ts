@@ -1,7 +1,7 @@
 export const test = async (): Promise<void> => {
   const { openDB } = await import('idb')
-  const { assertEqual, CacheWorker, deleteDatabase, Randomization } = await import('./_helpers.ts')
-  const databaseName = `cache-worker-${Randomization.getRandomUUID()}`
+  const { assertEqual, createCacheWorkerRpc, deleteDatabase } = await import('./_helpers.ts')
+  const databaseName = `cache-worker-${crypto.randomUUID()}`
   const isChromium = navigator.userAgent.includes('Chrome/')
   const database = await openDB(databaseName, 1, {
     upgrade(
@@ -15,24 +15,24 @@ export const test = async (): Promise<void> => {
   })
   await database.put('file-handles', { name: 'existing-value' }, 'existing-key')
   database.close()
-  const cacheWorker = await CacheWorker.create(new URL('assets/cacheWorkerMain.js', import.meta.url))
+  const cacheWorker = await createCacheWorkerRpc(new URL('assets/cacheWorkerMain.js', import.meta.url))
   let root: FileSystemDirectoryHandle | undefined
   let handleName: string | undefined
   try {
-    const existingValue = await cacheWorker.getIndexedDbFileHandle('existing-key', databaseName)
+    const existingValue = await cacheWorker.invoke('IndexedDb.getIndexedDbFileHandle', 'existing-key', databaseName)
     assertEqual(existingValue, { name: 'existing-value' }, 'IndexedDB should preserve existing database records')
     if (isChromium) {
       // Reading an OPFS handle back from IndexedDB crashes this local Chromium build; keep the general structured-clone path covered here.
-      await cacheWorker.addIndexedDbFileHandle('value', { name: 'cloneable-value' }, databaseName)
-      const result = (await cacheWorker.getIndexedDbFileHandle('value', databaseName)) as { readonly name: string }
+      await cacheWorker.invoke('IndexedDb.addIndexedDbFileHandle', 'value', { name: 'cloneable-value' }, databaseName)
+      const result = (await cacheWorker.invoke('IndexedDb.getIndexedDbFileHandle', 'value', databaseName)) as { readonly name: string }
       assertEqual(result, { name: 'cloneable-value' }, 'IndexedDB should preserve structured-cloneable values')
       return
     }
     root = await navigator.storage.getDirectory()
-    handleName = `handle-${Randomization.getRandomUUID()}`
+    handleName = `handle-${crypto.randomUUID()}`
     const handle = await root.getFileHandle(handleName, { create: true })
-    await cacheWorker.addIndexedDbFileHandle('file', handle, databaseName)
-    const restored = (await cacheWorker.getIndexedDbFileHandle('file', databaseName)) as FileSystemFileHandle
+    await cacheWorker.invoke('IndexedDb.addIndexedDbFileHandle', 'file', handle, databaseName)
+    const restored = (await cacheWorker.invoke('IndexedDb.getIndexedDbFileHandle', 'file', databaseName)) as FileSystemFileHandle
     assertEqual(await restored.isSameEntry(handle), true, 'IndexedDB should restore the same file handle')
   } finally {
     await cacheWorker.dispose()
