@@ -1,11 +1,11 @@
 export const test = async (): Promise<void> => {
-  const { assertEqual, createCacheWorkerRpc, ModuleWorkerRpcParent } = await import('./_helpers.ts')
+  const { assertEqual, ModuleWorkerRpcParent } = await import('./_helpers.ts')
   const cacheName = `cache-worker-${crypto.randomUUID()}`
   const key = `/cache-worker/${crypto.randomUUID()}`
   const jsonKey = `${key}/json`
   const jsonValue = { labels: ['café ☕', 'LVCE'], nested: [1, true, null] }
   const bytes = Uint8Array.of(0, 255, 128, 65)
-  const cacheWorker = await createCacheWorkerRpc(new URL('assets/cacheWorkerMain.js', import.meta.url))
+  const cacheWorker = await ModuleWorkerRpcParent.create({ commandMap: {}, url: new URL('assets/cacheWorkerMain.js', import.meta.url).href })
   const jsonRpc = await ModuleWorkerRpcParent.create({ commandMap: {}, url: new URL('assets/cacheWorkerMain.js', import.meta.url).href })
   try {
     const write = await cacheWorker.invoke('Cache.setCacheStorageItem', key, bytes, cacheName, {

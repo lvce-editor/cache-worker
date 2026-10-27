@@ -1,6 +1,6 @@
 export const test = async (): Promise<void> => {
-  const { assertEqual, createCacheWorkerRpc } = await import('./_helpers.ts')
-  const cacheWorker = await createCacheWorkerRpc(new URL('assets/cacheWorkerMain.js', import.meta.url))
+  const { assertEqual, ModuleWorkerRpcParent } = await import('./_helpers.ts')
+  const cacheWorker = await ModuleWorkerRpcParent.create({ commandMap: {}, url: new URL('assets/cacheWorkerMain.js', import.meta.url).href })
   const name = `cache-worker-${crypto.randomUUID()}.txt`
   let text
   let traversalRejected = false

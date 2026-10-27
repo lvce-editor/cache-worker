@@ -1,8 +1,4 @@
-import { ModuleWorkerRpcParent } from '@lvce-editor/rpc'
-
-export { ModuleWorkerRpcParent }
-
-export const createCacheWorkerRpc = (url: URL) => ModuleWorkerRpcParent.create({ commandMap: {}, url: url.href })
+export { ModuleWorkerRpcParent } from '@lvce-editor/rpc'
 
 export const assertEqual = (actual: unknown, expected: unknown, message: string): void => {
   const actualJson = JSON.stringify(actual)

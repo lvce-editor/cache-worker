@@ -1,10 +1,10 @@
 export const test = async (): Promise<void> => {
-  const { assertEqual, createCacheWorkerRpc, deleteDatabase } = await import('./_helpers.ts')
+  const { assertEqual, deleteDatabase, ModuleWorkerRpcParent } = await import('./_helpers.ts')
   const databaseName = `cache-worker-${crypto.randomUUID()}`
   let cacheWorker
   let reopened
   try {
-    cacheWorker = await createCacheWorkerRpc(new URL('assets/cacheWorkerMain.js', import.meta.url))
+    cacheWorker = await ModuleWorkerRpcParent.create({ commandMap: {}, url: new URL('assets/cacheWorkerMain.js', import.meta.url).href })
     let rejectedInvalidKey = false
     try {
       await cacheWorker.invoke('IndexedDb.addIndexedDbFileHandle', NaN, { name: 'invalid' }, databaseName)
@@ -24,7 +24,7 @@ export const test = async (): Promise<void> => {
     const arrayKey = await cacheWorker.invoke('IndexedDb.getIndexedDbFileHandle', [1, 'key'], databaseName)
     await cacheWorker.dispose()
     cacheWorker = undefined
-    reopened = await createCacheWorkerRpc(new URL('assets/cacheWorkerMain.js', import.meta.url))
+    reopened = await ModuleWorkerRpcParent.create({ commandMap: {}, url: new URL('assets/cacheWorkerMain.js', import.meta.url).href })
     const persisted = await reopened.invoke('IndexedDb.getIndexedDbFileHandle', 'remove-me', databaseName)
     await reopened.invoke('IndexedDb.removeIndexedDbFileHandle', 'missing', databaseName)
     assertEqual(

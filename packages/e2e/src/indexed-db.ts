@@ -1,6 +1,6 @@
 export const test = async (): Promise<void> => {
   const { openDB } = await import('idb')
-  const { assertEqual, createCacheWorkerRpc, deleteDatabase } = await import('./_helpers.ts')
+  const { assertEqual, deleteDatabase, ModuleWorkerRpcParent } = await import('./_helpers.ts')
   const databaseName = `cache-worker-${crypto.randomUUID()}`
   const isChromium = navigator.userAgent.includes('Chrome/')
   const database = await openDB(databaseName, 1, {
@@ -15,7 +15,7 @@ export const test = async (): Promise<void> => {
   })
   await database.put('file-handles', { name: 'existing-value' }, 'existing-key')
   database.close()
-  const cacheWorker = await createCacheWorkerRpc(new URL('assets/cacheWorkerMain.js', import.meta.url))
+  const cacheWorker = await ModuleWorkerRpcParent.create({ commandMap: {}, url: new URL('assets/cacheWorkerMain.js', import.meta.url).href })
   let root: FileSystemDirectoryHandle | undefined
   let handleName: string | undefined
   try {
