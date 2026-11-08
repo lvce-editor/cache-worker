@@ -19,6 +19,13 @@ export const test = async (): Promise<void> => {
     const missing = await cacheWorker.invoke('Cache.getCacheStorageItem', key, cacheName)
     const jsonWrite = await jsonRpc.invoke('Cache.setCacheStorageJsonItem', jsonKey, jsonValue, cacheName)
     const storedJson = await jsonRpc.invoke('Cache.getCacheStorageJsonItem', jsonKey, cacheName)
+    const jsonResponse = await (await caches.open(cacheName)).match(jsonKey)
+    if (!jsonResponse) {
+      throw new Error('JSON Cache Storage response was not found after writing')
+    }
+    const jsonBody = await jsonResponse.arrayBuffer()
+    assertEqual(jsonResponse.headers.get('content-length'), String(jsonBody.byteLength), 'JSON Content-Length should match the stored UTF-8 bytes')
+    assertEqual(jsonResponse.headers.get('content-type'), 'application/json', 'JSON Content-Type should be preserved')
     assertEqual(
       { body: [...new Uint8Array(stored.body)], headers: stored.headers, jsonWrite, missing, removed, storedJson, write },
       {
