@@ -19,6 +19,12 @@ export const test = async (): Promise<void> => {
     const missing = await cacheWorker.invoke('Cache.getCacheStorageItem', key, cacheName)
     const jsonWrite = await jsonRpc.invoke('Cache.setCacheStorageJsonItem', jsonKey, jsonValue, cacheName)
     const storedJson = await jsonRpc.invoke('Cache.getCacheStorageJsonItem', jsonKey, cacheName)
+    const storedJsonResponse = await jsonRpc.invoke('Cache.getCacheStorageItem', jsonKey, cacheName)
+    assertEqual(
+      storedJsonResponse.headers['content-length'],
+      String(storedJsonResponse.body.byteLength),
+      'JSON Content-Length should match the stored UTF-8 byte length',
+    )
     assertEqual(
       { body: [...new Uint8Array(stored.body)], headers: stored.headers, jsonWrite, missing, removed, storedJson, write },
       {

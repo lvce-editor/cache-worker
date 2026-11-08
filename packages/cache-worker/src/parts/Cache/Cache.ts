@@ -119,7 +119,11 @@ export const setCacheStorageJsonItem = async (
     if (serialized === undefined) {
       throw new TypeError('Value is not JSON serializable')
     }
-    return await setCacheStorageItem(request, serialized, cacheName, { 'content-type': 'application/json' }, bucketName, bucketOptions)
+    const headers = {
+      'content-length': String(new TextEncoder().encode(serialized).byteLength),
+      'content-type': 'application/json',
+    }
+    return await setCacheStorageItem(request, serialized, cacheName, headers, bucketName, bucketOptions)
   } catch (error) {
     return {
       errorCode: 'CACHE_STORAGE_WRITE_FAILED',

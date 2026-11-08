@@ -146,8 +146,11 @@ test('JSON cache items round trip JSON values and distinguish null from a miss',
       const values: readonly unknown[] = [{ nested: [true, 3, null], title: 'café ☕' }, ['array', 2], 'text', 42, false, null]
       for (const [index, value] of values.entries()) {
         expect(await Cache.setCacheStorageJsonItem(`/json/${index}`, value)).toEqual({ success: true })
-        expect(await Cache.getCacheStorageJsonItem(`/json/${index}`)).toEqual({ value })
         expect(entries.get(`/json/${index}`)?.headers.get('content-type')).toBe('application/json')
+        const response = entries.get(`/json/${index}`)
+        const body = await response?.clone().arrayBuffer()
+        expect(response?.headers.get('content-length')).toBe(String(body?.byteLength))
+        expect(await Cache.getCacheStorageJsonItem(`/json/${index}`)).toEqual({ value })
       }
       expect(await Cache.getCacheStorageJsonItem('/missing')).toBeNull()
     },
