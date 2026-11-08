@@ -19,7 +19,8 @@ export const test = async (): Promise<void> => {
     const missing = await cacheWorker.invoke('Cache.getCacheStorageItem', key, cacheName)
     const jsonWrite = await jsonRpc.invoke('Cache.setCacheStorageJsonItem', jsonKey, jsonValue, cacheName)
     const storedJson = await jsonRpc.invoke('Cache.getCacheStorageJsonItem', jsonKey, cacheName)
-    const jsonResponse = await (await caches.open(cacheName)).match(jsonKey)
+    const cache = await caches.open(cacheName)
+    const jsonResponse = await cache.match(jsonKey)
     if (!jsonResponse) {
       throw new Error('JSON Cache Storage response was not found after writing')
     }
